@@ -1,4 +1,4 @@
-Certainly! Here's a complete and cohesive `MODEL.md` for your GPT-1 `model.py` file, presented in a single, unbroken format for better clarity:
+`MODEL.md` for GPT-1 `model.py`
 
 ```markdown
 # MODEL.md
