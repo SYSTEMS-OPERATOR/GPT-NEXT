@@ -1,4 +1,4 @@
-Here's a `DATASET.md` file for the `dataset.py` script, documenting the `TokenIDDataset` and `TokenIDSubset` classes, along with suggested optimizations:
+`DATASET.md` for the `dataset.py` script, documenting the `TokenIDDataset` and `TokenIDSubset` classes, along with suggested optimizations:
 
 ```markdown
 # DATASET.md
