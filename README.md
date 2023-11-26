@@ -35,7 +35,7 @@ We welcome contributions from the community. Please refer to the [CONTRIBUTING.m
 For the versions available, see the [tags on this repository](https://github.com/yourproject/tags).
 
 ## Authors and Acknowledgements
-- [Your Name] - Initial work - [Mind-Interfaces/GPT-1/](https://github.com/Mind-Interfaces/GPT-1/).
+- [Your Name] - Initial work - [Mind-Interfaces/GPT-1/](https://github.com/Mind-Interfaces/GPT-1/)
 - Acknowledgements to anyone whose resources were used
 
 ## License
