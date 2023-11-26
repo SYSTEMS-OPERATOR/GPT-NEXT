@@ -39,4 +39,4 @@ For the versions available, see the [tags on this repository](https://github.com
 - Acknowledgements to anyone whose resources were used
 
 ## License
-This project is licensed under [LICENSE NAME] - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under MIT - see the [LICENSE](LICENSE) file for details.
