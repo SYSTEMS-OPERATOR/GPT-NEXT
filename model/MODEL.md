@@ -150,8 +150,3 @@ class GPT(Module):
 ```
 
 ---
-
-These optimizations are intended for future development and should be carefully implemented and validated.
-```
-This
-```
