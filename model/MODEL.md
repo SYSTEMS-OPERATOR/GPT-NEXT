@@ -1,6 +1,5 @@
 `MODEL.md` for GPT-1 `model.py`
 
-```markdown
 # MODEL.md
 
 ## GPT-1 Model Implementation Documentation
