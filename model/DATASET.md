@@ -92,8 +92,3 @@ class TokenIDDataset(IterableDataset):
 ```
 
 ---
-
-These optimizations aim to enhance the efficiency, scalability, and effectiveness of the dataset handling in the GPT-1 model. They should be implemented and tested carefully to ensure compatibility with the existing model architecture and training regime.
-```
-
-You can add this `DATASET.md` file to your GitHub repository for a clear and comprehensive guide on your dataset implementation, along with future development directions. 🌟🐾👩‍💻📝🤖📚
