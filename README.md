@@ -1,7 +1,6 @@
 # GPT-1
 Generative Pre-trained Transformer 1 (GPT-1)
-
-[GPT-1](https://upload.wikimedia.org/wikipedia/commons/9/91/Full_GPT_architecture.png)
+![GPT-1](https://upload.wikimedia.org/wikipedia/commons/9/91/Full_GPT_architecture.png)
 
 ## Architecture
 The GPT-1 architecture is a twelve-layer decoder-only transformer, utilizing twelve masked self-attention heads, with 64-dimensional states each (for a total of 768). The model utilizes the Adam optimization algorithm, diverging from simple stochastic gradient descent; the learning rate was progressively increased from zero over the first 2,000 updates to a peak of 2.5×10−4, followed by annealing to 0 using a cosine schedule.
