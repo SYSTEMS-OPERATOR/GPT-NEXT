@@ -14,7 +14,7 @@ GPT-1 showcased remarkable capabilities in various natural language processing t
 - Text summarization
 - Question answering
 
-The model's performance was particularly notable in tasks requiring contextual understanding and generation of coherent, contextually relevant text.
+The model's performance was particularly notable in tasks requiring contextual understanding and the generation of coherent, contextually relevant text.
 
 ## Implementation
 This repository provides implementation details and resources for GPT-1. Users can utilize this model for various NLP tasks, adapting it to specific requirements and datasets.
@@ -35,7 +35,7 @@ We welcome contributions from the community. Please refer to the [CONTRIBUTING.m
 For the versions available, see the [tags on this repository](https://github.com/yourproject/tags).
 
 ## Authors and Acknowledgements
-- [Your Name] - Initial work - [YourGitHub](https://github.com/YourGithub)
+- [Your Name] - Initial work - [Mind-Interfaces/GPT-1/](https://github.com/Mind-Interfaces/GPT-1/).
 - Acknowledgements to anyone whose resources were used
 
 ## License
