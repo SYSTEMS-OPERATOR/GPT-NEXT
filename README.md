@@ -2,7 +2,7 @@
 Generative Pre-trained Transformer 1 (GPT-1)
 
 ## Architecture
-The GPT-1 architecture was a twelve-layer decoder-only transformer, utilizing twelve masked self-attention heads, with 64-dimensional states each (for a total of 768). The model utilized the Adam optimization algorithm, diverging from simple stochastic gradient descent; the learning rate was progressively increased from zero over the first 2,000 updates to a peak of 2.5×10−4, followed by annealing to 0 using a cosine schedule.
+The GPT-1 architecture is a twelve-layer decoder-only transformer, utilizing twelve masked self-attention heads, with 64-dimensional states each (for a total of 768). The model utilizes the Adam optimization algorithm, diverging from simple stochastic gradient descent; the learning rate was progressively increased from zero over the first 2,000 updates to a peak of 2.5×10−4, followed by annealing to 0 using a cosine schedule.
 
 ## Training
 GPT-1 was trained on the BooksCorpus dataset, containing over 7,000 unique unpublished books, amounting to nearly 800 million words. This extensive corpus provided a diverse range of vocabulary, narrative styles, and topics, enabling the model to develop a broad understanding of language patterns and structures.
