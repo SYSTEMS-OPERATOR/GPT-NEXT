@@ -36,6 +36,8 @@ For the versions available, see the [tags on this repository](https://github.com
 
 ## Authors and Acknowledgements
 - [Your Name] - Initial work - [Mind-Interfaces/GPT-1/](https://github.com/Mind-Interfaces/GPT-1/)
+- Akshat Pandey - Pytorch implementation of GPT-1 - https://github.com/akshat0123/GPT-1/
+- Sosuke Kobayashi - Homemade BookCorpus - https://github.com/soskek/bookcorpus
 - Acknowledgements to anyone whose resources were used
 
 ## License
