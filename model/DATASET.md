@@ -1,6 +1,6 @@
 `DATASET.md` for the `dataset.py` script, documenting the `TokenIDDataset` and `TokenIDSubset` classes, along with suggested optimizations:
 
-```markdown
+
 # DATASET.md
 
 ## Dataset Implementation for GPT-1
