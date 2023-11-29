@@ -1,4 +1,5 @@
 # q-star.py
+import heapq  # For priority queue used in A* algorithm
 
 import torch
 import torch.nn as nn
@@ -109,7 +110,7 @@ class PriorityQueue:
 
     def get(self):
         return heapq.heappop(self.elements)
-
+        
 
 class QStarGPT:
     """
@@ -118,7 +119,7 @@ class QStarGPT:
     def __init__(self, vocab, seq, n_layers, n_heads, dim, hidden, dropout, device):
         self.gpt_model = GPT(vocab, seq, n_layers, n_heads, dim, hidden, dropout, device)
         self.q_network = QNetwork()
-        self.a_star_predictor = AStarTokenPredictor()
+        self.a_star_predictor = AStarTokenPredictor(self.gpt_model)
 
     def generate_text(self, prompt):
         """
@@ -128,30 +129,57 @@ class QStarGPT:
         Returns:
             str: Generated text.
         """
-        # Placeholder for text generation logic integrating A* with GPT
-        generated_text = "Generated text"
-        return generated_text
+        current_state = prompt
+        generated_text = []
+
+        # Iterate until a stopping condition is met (e.g., end of sentence token)
+        while not self.a_star_predictor.is_goal_state(current_state):
+            # Obtain next token probabilities from GPT model
+            token_probs = self.gpt_model.get_next_token_probabilities(current_state)
+            next_token = self.a_star_predictor.predict_next_token(current_state, token_probs)
+            generated_text.append(next_token)
+            current_state += next_token
+
+        return ' '.join(generated_text)
 
     def update_model(self, feedback):
         """
         Updates the GPT model based on feedback from the Q-Network.
+        This method should be implemented based on the specific way you want to update the GPT model.
         Args:
             feedback (Tensor): Feedback score from the Q-Network.
         """
-        # Placeholder for model update logic based on Q-network feedback
+        # Update model parameters or training strategy based on feedback
+        # This could involve adjusting learning rates, changing training data weights, etc.
         pass
 
     def train(self, data):
         """
-        Training loop for the Q*GPT-1 model.
+        Training loop for the Q*GPT model.
         Args:
             data (iterable): Training data.
         """
         for batch in data:
             generated_text = self.generate_text(batch['prompt'])
-            # Assume appropriate preprocessing to convert text to tensor
-            reward_score = self.q_network(torch.tensor(generated_text))
+            # Convert generated text to a tensor for processing by the Q-network
+            # This conversion will depend on how your Q-network expects the input
+            text_tensor = self.convert_text_to_tensor(generated_text)
+            reward_score = self.q_network(text_tensor)
             self.update_model(reward_score)
+
+    def convert_text_to_tensor(self, text):
+        """
+        Converts text to a tensor format suitable for the Q-Network.
+        This method should be implemented based on your Q-Network's input requirements.
+        Args:
+            text (str): The generated text.
+        Returns:
+            Tensor: Tensor representation of the text.
+        """
+        # Placeholder for text-to-tensor conversion logic
+        # This will depend on your Q-Network's design
+        return torch.tensor([0])  # Example placeholder
+
 
 # Example usage
 vocab_size = 10000  # Example vocabulary size
