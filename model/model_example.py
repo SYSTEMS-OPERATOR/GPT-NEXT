@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
+from torch.nn.init import normal_, zeros_
 
 class GPT1(nn.Module):
     """
-    Simplified version of the GPT-1 model.
+    Simplified version of the GPT-1 model with detailed structure and comments.
     Args:
         vocab_size (int): Size of the vocabulary.
         max_seq_len (int): Maximum sequence length.
@@ -18,8 +19,24 @@ class GPT1(nn.Module):
 
         self.token_embeddings = nn.Embedding(vocab_size, d_model)
         self.position_embeddings = nn.Embedding(max_seq_len, d_model)
-        self.layers = nn.ModuleList([TransformerBlock(d_model, n_heads, d_ff, dropout_rate) for _ in range(n_layers)])
-        self.linear = nn.Linear(d_model, vocab_size)
+
+        self.layers = nn.ModuleList([
+            TransformerBlock(d_model, n_heads, d_ff, dropout_rate)
+            for _ in range(n_layers)
+        ])
+
+        self.final_linear = nn.Linear(d_model, vocab_size)
+
+        self.init_weights()
+
+    def init_weights(self):
+        """
+        Initializes weights of the model with specific values for stability.
+        """
+        normal_(self.token_embeddings.weight, mean=0.0, std=0.02)
+        normal_(self.position_embeddings.weight, mean=0.0, std=0.02)
+        normal_(self.final_linear.weight, mean=0.0, std=0.02)
+        zeros_(self.final_linear.bias)
 
     def forward(self, x):
         """
@@ -35,13 +52,12 @@ class GPT1(nn.Module):
         for layer in self.layers:
             x = layer(x)
 
-        x = self.linear(x)
+        x = self.final_linear(x)
         return x
-
 
 class TransformerBlock(nn.Module):
     """
-    Transformer block used in the GPT-1 model.
+    Transformer block consisting of multi-head attention and feed-forward layers.
     Args:
         d_model (int): Dimension of the model.
         n_heads (int): Number of attention heads.
@@ -51,7 +67,7 @@ class TransformerBlock(nn.Module):
     def __init__(self, d_model, n_heads, d_ff, dropout_rate):
         super(TransformerBlock, self).__init__()
 
-        self.attention = MultiHeadAttention(d_model, n_heads)
+        self.attention = MultiHeadAttention(d_model, n_heads, dropout_rate)
         self.feed_forward = nn.Sequential(
             nn.Linear(d_model, d_ff),
             nn.GELU(),
@@ -70,12 +86,11 @@ class TransformerBlock(nn.Module):
         Returns:
             Tensor: Output tensor.
         """
-        x2 = self.norm1(x)
-        x = x + self.dropout(self.attention(x2, x2, x2))
-        x2 = self.norm2(x)
-        x = x + self.feed_forward(x2)
+        attn_output = self.attention(x, x, x)
+        x = self.norm1(x + self.dropout(attn_output))
+        ff_output = self.feed_forward(x)
+        x = self.norm2(x + self.dropout(ff_output))
         return x
-
 
 class MultiHeadAttention(nn.Module):
     """
@@ -83,8 +98,9 @@ class MultiHeadAttention(nn.Module):
     Args:
         d_model (int): Dimension of the model.
         n_heads (int): Number of attention heads.
+        dropout_rate (float): Dropout rate.
     """
-    def __init__(self, d_model, n_heads):
+    def __init__(self, d_model, n_heads, dropout_rate):
         super(MultiHeadAttention, self).__init__()
         self.d_k = d_model // n_heads
         self.h = n_heads
@@ -92,6 +108,7 @@ class MultiHeadAttention(nn.Module):
         self.v_linear = nn.Linear(d_model, d_model)
         self.k_linear = nn.Linear(d_model, d_model)
         self.out = nn.Linear(d_model, d_model)
+        self.dropout = nn.Dropout(dropout_rate)
 
     def forward(self, q, k, v):
         """
@@ -115,13 +132,13 @@ class MultiHeadAttention(nn.Module):
         q = q.transpose(1,2)
         v = v.transpose(1,2)
 
-        # Calculate attention using function we will define next
-        scores = torch.matmul(q, k.transpose(-2, -1)) /  math.sqrt(self.d_k)
+        scores = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(torch.tensor(self.d_k, dtype=torch.float32))
         attn = nn.Softmax(dim=-1)(scores)
+        attn = self.dropout(attn)
         context = torch.matmul(attn, v)
 
         # Concatenate heads and put through final linear layer
-        context = context.transpose(1, 2).contiguous().view(bs, -1, self.d_model)
+        context = context.transpose(1, 2).contiguous().view(bs, -1, self.d_k * self.h)
         output = self.out(context)
 
         return output
