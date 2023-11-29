@@ -37,37 +37,83 @@ class AStarTokenPredictor:
     A* Token Predictor for enhancing token prediction in GPT.
     Uses A* algorithm to choose the next token based on GPT output probabilities and contextual appropriateness.
     """
-    def __init__(self):
-        # Initialization for A* predictor
-        # ...
+    def __init__(self, gpt_model):
+        self.gpt_model = gpt_model  # GPT model for generating token probabilities
 
-    def predict_next_token(self, current_state, possible_tokens):
+    def predict_next_token(self, current_state):
         """
         Predicts the next token using the A* algorithm.
         Args:
-            current_state: Current state/context of the text.
-            possible_tokens: List of possible next tokens with probabilities.
+            current_state: The current state/context of the text.
         Returns:
             Token: The next token predicted by A* algorithm.
         """
-        # Placeholder for actual A* logic
-        return min(possible_tokens, key=lambda token: self.cost_function(current_state, token))
+        open_set = PriorityQueue()
+        open_set.put((0, current_state))  # Priority queue of states, sorted by cost
+
+        while not open_set.empty():
+            _, current_state = open_set.get()
+
+            # If current state is a goal state, return the chosen token
+            if self.is_goal_state(current_state):
+                return current_state.last_token()
+
+            # Generate possible next tokens and their probabilities
+            possible_tokens = self.gpt_model.generate_next_tokens(current_state)
+
+            for token in possible_tokens:
+                new_state = current_state + token  # Append token to the state
+                cost = self.cost_function(current_state, token)
+                
+                # Add new state to the open set
+                open_set.put((cost, new_state))
 
     def cost_function(self, current_state, next_token):
         """
         Cost function for A* algorithm in token prediction.
         Args:
-            current_state: Current state/context of the text.
+            current_state: The current state/context of the text.
             next_token: Potential next token.
         Returns:
             float: Cost associated with the next token.
         """
-        # Example: negative probability as cost, can be expanded with contextual analysis
-        return -next_token.probability
+        # Example cost function using negative log probability
+        # This can be expanded with additional contextual analysis
+        return -torch.log(next_token.probability)
 
-class QStarGPT1:
+    def is_goal_state(self, state):
+        """
+        Determines if the given state is a goal state.
+        Args:
+            state: The current state/context of the text.
+        Returns:
+            bool: True if the state is a goal state, False otherwise.
+        """
+        # Define goal criteria, e.g., end of sentence, maximum length, etc.
+        # ...
+        pass
+
+
+class PriorityQueue:
     """
-    Q*GPT-1 Model: Integrates GPT with Q-learning (Q-Network) and A* token prediction.
+    A simple Priority Queue implementation for the A* algorithm.
+    """
+    def __init__(self):
+        self.elements = []
+
+    def empty(self):
+        return len(self.elements) == 0
+
+    def put(self, item):
+        heapq.heappush(self.elements, item)
+
+    def get(self):
+        return heapq.heappop(self.elements)
+
+
+class QStarGPT:
+    """
+    Q*GPT Model: Integrates GPT with Q-learning (Q-Network) and A* token prediction.
     """
     def __init__(self, vocab, seq, n_layers, n_heads, dim, hidden, dropout, device):
         self.gpt_model = GPT(vocab, seq, n_layers, n_heads, dim, hidden, dropout, device)
@@ -110,6 +156,6 @@ class QStarGPT1:
 # Example usage
 vocab_size = 10000  # Example vocabulary size
 seq_length = 128    # Example sequence length
-q_star_gpt1 = QStarGPT1(vocab_size, seq_length, 12, 12, 768, 3072, 0.1, 'cuda')
+q_star_gpt = QStarGPT(vocab_size, seq_length, 12, 12, 768, 3072, 0.1, 'cuda')
 training_data = [{'prompt': 'Example prompt'}]  # Placeholder for training data
-q_star_gpt1.train(training_data)
+q_star_gpt.train(training_data)
