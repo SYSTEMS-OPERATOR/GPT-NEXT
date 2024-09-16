@@ -136,10 +136,16 @@ class QStarGPT:
     """
     def __init__(self, vocab_size, seq_length, n_layers, n_heads, dim, hidden, dropout, device):
         self.device = device
-        self.gpt_model = GPT(vocab_size, seq_length, n_layers, n_heads, dim, hidden, dropout, device)
-        self.q_network = QNetwork(input_size=dim)
+        self.gpt_model = GPT(vocab_size, seq_length, n_layers, n_heads, dim, hidden, dropout, device).to(device)
+        self.q_network = QNetwork(input_size=dim).to(device)
         self.a_star_predictor = AStarTokenPredictor(self.gpt_model, vocab_size, seq_length)
-        self.tokenizer = self.gpt_model.tokenizer  # Assuming the GPT model has a tokenizer
+        # Assume the tokenizer is defined elsewhere or within the GPT model
+        self.tokenizer = self.gpt_model.tokenizer  # Replace with actual tokenizer
+        # Initialize optimizer
+        self.optimizer = torch.optim.Adam(
+            list(self.gpt_model.parameters()) + list(self.q_network.parameters()),
+            lr=1e-4
+        )
 
     def generate_text(self, prompt):
         """
@@ -151,28 +157,30 @@ class QStarGPT:
         """
         # Convert prompt to token IDs
         current_sequence = self.tokenizer.encode(prompt)
-        generated_text = []
+        generated_sequence = current_sequence.copy()
 
         # Iterate until a stopping condition is met (e.g., end of sentence token)
-        while not self.a_star_predictor.is_goal_state(current_sequence):
-            next_token_id = self.a_star_predictor.predict_next_token(current_sequence)
-            generated_text.append(next_token_id)
-            current_sequence.append(next_token_id)
+        while not self.a_star_predictor.is_goal_state(generated_sequence):
+            next_token_id = self.a_star_predictor.predict_next_token(generated_sequence)
+            generated_sequence.append(next_token_id)
 
         # Convert token IDs back to text
-        generated_text_str = self.tokenizer.decode(generated_text)
+        generated_text_str = self.tokenizer.decode(generated_sequence[len(current_sequence):])
         return generated_text_str
 
-    def update_model(self, feedback):
+    def update_model(self, token_tensor, reward_score):
         """
         Updates the GPT model based on feedback from the Q-Network.
-        This method should be implemented based on the specific way you want to update the GPT model.
         Args:
-            feedback (Tensor): Feedback score from the Q-Network.
+            token_tensor (Tensor): Token tensor of the generated text.
+            reward_score (Tensor): Feedback score from the Q-Network.
         """
-        # Placeholder for model update logic
-        # This could involve backpropagation using the feedback score
-        pass
+        # Compute loss (e.g., negative reward)
+        loss = -reward_score.mean()
+        # Backpropagation
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
     def train(self, data):
         """
@@ -180,21 +188,16 @@ class QStarGPT:
         Args:
             data (iterable): Training data.
         """
-        optimizer = torch.optim.Adam(list(self.gpt_model.parameters()) + list(self.q_network.parameters()))
         for batch in data:
             prompt = batch['prompt']
             # Generate text using the current model
             generated_text = self.generate_text(prompt)
             # Convert generated text to a tensor for processing by the Q-network
-            text_tensor = self.convert_text_to_tensor(generated_text)
+            token_tensor = self.convert_text_to_tensor(generated_text)
             # Get the reward score from the Q-network
-            reward_score = self.q_network(text_tensor)
-            # Compute loss (e.g., negative reward)
-            loss = -reward_score.mean()
-            # Backpropagation
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+            reward_score = self.q_network(token_tensor)
+            # Update the model using the reward score
+            self.update_model(token_tensor, reward_score)
 
     def convert_text_to_tensor(self, text):
         """
@@ -209,17 +212,16 @@ class QStarGPT:
         # Convert to tensor and move to device
         token_tensor = torch.tensor(token_ids, dtype=torch.long).unsqueeze(0).to(self.device)
         # Get the hidden states from the GPT model
-        with torch.no_grad():
-            outputs = self.gpt_model(token_tensor)
-            hidden_states = outputs.last_hidden_state  # Assuming GPT model returns outputs with last_hidden_state
+        logits, hidden_states = self.gpt_model(token_tensor, ignore=None)
         # Take the last hidden state
         last_hidden_state = hidden_states[:, -1, :]
         return last_hidden_state
 
 # Example usage
-vocab_size = 10000  # Example vocabulary size
-seq_length = 128    # Example sequence length
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-q_star_gpt = QStarGPT(vocab_size, seq_length, 12, 12, 768, 3072, 0.1, device)
-training_data = [{'prompt': 'Example prompt'}]  # Placeholder for training data
-q_star_gpt.train(training_data)
+if __name__ == "__main__":
+    vocab_size = 10000  # Example vocabulary size
+    seq_length = 128    # Example sequence length
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    q_star_gpt = QStarGPT(vocab_size, seq_length, 12, 12, 768, 3072, 0.1, device)
+    training_data = [{'prompt': 'Example prompt'}]  # Placeholder for training data
+    q_star_gpt.train(training_data)
