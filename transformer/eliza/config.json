@@ -1,0 +1,17 @@
+{
+  "HOST": "0.0.0.0",
+  "PORT": 5000,
+  "JWT_SECRET": "your-256-bit-secret",
+  "JWT_ALGORITHM": "HS256",
+  "RATE_LIMIT": "60 per minute",
+  "LOG_LEVEL": "INFO",
+  "LOG_FILE": null,
+  "SYSLOG_HOST": null,
+  "SYSLOG_PORT": null,
+  "ALLOWED_IPS": [],
+  "BLOCKED_IPS": [],
+  "REQUIRE_CLIENT_CERT": false,
+  "TLS_CERT": null,
+  "TLS_KEY": null,
+  "CA_CERT": null
+}
