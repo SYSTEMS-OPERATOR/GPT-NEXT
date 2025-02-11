@@ -1,0 +1,13 @@
+[Unit]
+Description=Doctor Chatbot API Service
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/doctor
+EnvironmentFile=/opt/doctor/.env
+User=doctor
+ExecStart=/usr/local/bin/gunicorn -w 4 -b 0.0.0.0:5001 doctor.app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
