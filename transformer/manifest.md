@@ -1,0 +1,22 @@
+# Repository Manifest
+
+- **eliza/** - *ELIZA service module (chatbot API)*
+  - **app.py** – Flask application for the ELIZA API service (routes, JWT auth, rate limiting).
+  - **config.json** – Default configuration values for the ELIZA service (used if env vars are not set).
+  - **.env.example** – Example environment variable definitions for ELIZA (to be copied/renamed to `.env` in deployment).
+  - **Dockerfile** – Docker image definition for containerizing the ELIZA service.
+  - **eliza.service** – Example systemd unit file for running ELIZA service as a Linux daemon.
+- **doctor/** - *DOCTOR service module (chatbot API with same logic, separate instance)*
+  - **app.py** – Flask application for the DOCTOR API service.
+  - **config.json** – Default configuration for the DOCTOR service.
+  - **.env.example** – Example environment variables for DOCTOR.
+  - **Dockerfile** – Docker image definition for the DOCTOR service.
+  - **doctor.service** – Systemd service file for running DOCTOR as a daemon.
+- **services/** - *Shared code utilized by both ELIZA and DOCTOR*
+  - **__init__.py** – (empty file) Marks the `services` directory as a Python package.
+  - **config.py** – Configuration loader utility (loads `.env` and JSON, with environment override logic).
+  - **logging_utils.py** – Logging setup utility (JSON formatter and optional file/remote log handlers).
+  - **dialogue.py** – Chatbot dialogue logic (pattern-response rules for generating replies).
+- **README.md** – Primary documentation with setup instructions, usage examples, and API reference.
+- **operator_troubleshooting.md** – Detailed guide for installation issues, debugging tips, and security best practices for operators.
+- **manifest.md** – Repository manifest (this file), listing all components and their purposes.
