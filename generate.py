@@ -8,7 +8,9 @@ from model.sequencer import Sequencer
 from model.model import GPT
 
 
-confpath = 'confs/generate.yml'
+# Default configuration path. The repository stores configuration files under
+# the `conf/` directory so the generation config should live there.
+confpath = 'conf/generate.yml'
 
 
 def main():

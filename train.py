@@ -29,8 +29,11 @@ def publish_metrics(logger, train_metrics, dev_metrics, epoch):
     for key in train_metrics:
         logger.add_scalar(f'train_{key}', train_metrics[key], epoch)
 
+    # Log development metrics using the correct dictionary. Previously this
+    # function mistakenly referenced ``train_metrics`` which caused the
+    # development values to be duplicated in TensorBoard.
     for key in dev_metrics:
-        logger.add_scalar(f'dev_{key}', train_metrics[key], epoch)
+        logger.add_scalar(f'dev_{key}', dev_metrics[key], epoch)
 
 
 def main():
