@@ -44,8 +44,10 @@ class Sequencer:
         self.model.eval()
         with no_grad():
             for i in trange(length):
-                probs = self.model(token_ids, ignore_ids)
-                next_id = self.gen_next_token(probs, idx)
+                # ``self.model`` returns a tuple ``(logits, hidden_states)``.
+                # Only the logits are required for probability calculation.
+                logits, _ = self.model(token_ids, ignore_ids)
+                next_id = self.gen_next_token(logits, idx)
                 tokens.append(self.tokenizer.get_byte(str(next_id.item())))
                 token_ids, ignore_ids, idx = self.update_token_ids(
                     idx, token_ids, next_id
@@ -72,7 +74,10 @@ class Sequencer:
 
         if start:
 
-            chunks = string.split(" ")
+            # ``start`` is the initial user provided text. The previous
+            # implementation attempted to split an undefined variable
+            # ``string`` which resulted in a NameError.
+            chunks = start.split(" ")
             for chunk in chunks:
                 bytes_ = list(chunk) + [self.tokenizer.get_eow()]
                 tokens += self.tokenizer.merge_bytes(bytes_)
