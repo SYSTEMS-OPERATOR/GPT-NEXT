@@ -1,21 +1,21 @@
-# GPT-1
-This repository contains a pytorch implementation of the GPT-1 model introduced
+# GPT-1 🛠️
+This repository contains a PyTorch implementation of the GPT-1 model introduced
 by OpenAI in the paper [Improving Language Understanding with Unsupervised
-Learning][1]. This repository contains source code for the model as well as code
-for preprocessing training data and the pre-training/fine-tuning process.
+Learning][1]. It provides source code for the model along with scripts for
+preprocessing training data and the pre-training/fine-tuning process.
 
-## Setup
+## Setup ⚙️
 All required modules for running the code is in the `env.yml` file in the
 *confs* directory. You can create the conda environment with:
     
     conda env create -f confs/env.yml
 
-## Data Collection
+## Data Collection 📚
 The original BookCorpus data set used to pretrain GPT is no longer distributed.
 However, [this][2] repository provides several resources for recreating or
 downloading a similar data set.
 
-## Preprocessing
+## Preprocessing ✂️
 GPT uses [byte pair encodings][3] to tokenize. The *preprocessing* directory
 contains a script for training a byte pair encoding tokenizer (`train_bpe.py`)
 and another script for tokenizing a dataset using the trained tokenizer
@@ -60,7 +60,7 @@ specified by the `-l` flag. During training, the `TokenIDDataset` class returns
 random sequence-size segments of each line, so be sure to set your line length
 to be greater than the sequence size you intend to use in your model instance.
 
-## Training
+## Training 🏋️
 Both pre-training and fine-tuning can be performed with the `train.py` script.
 If a checkpoint directory is specified with the `-ch` flag, training will
 continue from that checkpoint.
@@ -71,7 +71,7 @@ Language Understanding with Unsupervised Learning][1], with the exception of
 sequence size and batch size. I sequence size to 128 rather than 512, and batch
 size to 32 rather than 64 in order to train on a single GPU. 
 
-## Text Generation
+## Text Generation 📝
 Text generation is implemented using top-k sampling and can be performed with
 the `generate.py` script. All generation parameters are located in the
 `generate.yml` file in the *confs* folder.
