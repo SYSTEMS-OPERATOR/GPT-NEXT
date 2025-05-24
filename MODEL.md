@@ -1,3 +1,5 @@
+# GPT-1 Architecture Diagram 🖼️
+
 ```mermaid
 flowchart TD;
     A[Input] -->|Embedding| B[Input Embedding];
