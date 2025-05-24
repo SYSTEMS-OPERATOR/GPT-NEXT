@@ -1,4 +1,4 @@
-# Repository Manifest
+# Repository Manifest 📁
 
 - **eliza/** - *ELIZA service module (chatbot API)*
   - **app.py** – Flask application for the ELIZA API service (routes, JWT auth, rate limiting).

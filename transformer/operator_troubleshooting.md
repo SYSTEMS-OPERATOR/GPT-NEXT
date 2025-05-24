@@ -1,4 +1,4 @@
-# Operator Troubleshooting & Best Practices
+# Operator Troubleshooting & Best Practices 🛠️
 
 This guide provides troubleshooting tips for common issues during installation and runtime, as well as best practices for operating the ELIZA and DOCTOR services securely and efficiently.
 

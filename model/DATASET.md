@@ -1,9 +1,9 @@
 `DATASET.md` for the `dataset.py` script, documenting the `TokenIDDataset` and `TokenIDSubset` classes, along with suggested optimizations:
 
 
-# DATASET.md
+# DATASET.md 📊
 
-## Dataset Implementation for GPT-1
+## Dataset Implementation for GPT-1 📂
 
 This document provides a detailed overview and documentation of the `dataset.py` script used in the GPT-1 implementation. It includes descriptions of the dataset classes and methods, followed by suggested optimizations for future development.
 

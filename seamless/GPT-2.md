@@ -1,4 +1,4 @@
-# Seamless Toroidal Optimization on GPT-2 Variants: Scaling and Benchmarks
+# Seamless Toroidal Optimization on GPT-2 Variants: Scaling and Benchmarks 🔄
 
 ## Fine-Tuning Scope
 Applying *seamless (toroidal) optimization* to GPT models involves fine-tuning each model on a specialized arithmetic dataset under identical conditions. All GPT-2 variants – Small, Medium, Large, and XL – as well as the baseline GPT-1 model (for reference), were trained on the **same structured arithmetic dataset** previously used in GPT-1 experiments. This dataset consists of tasks designed to stress the models’ arithmetic capabilities:
