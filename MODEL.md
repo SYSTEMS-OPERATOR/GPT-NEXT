@@ -11,7 +11,7 @@ flowchart TD;
     G --> H[LayerNorm];
     H --> I[Output Linear];
     I --> J[Softmax];
-    
+
     subgraph Transformer Block 1;
         E1[MultiHead Attention] --> E2[Dropout];
         E2 --> E3[Add & Norm];
@@ -19,7 +19,7 @@ flowchart TD;
         E4 --> E5[Dropout];
         E5 --> E6[Add & Norm];
     end;
-    
+
     subgraph Transformer Block 2;
         F1[MultiHead Attention] --> F2[Dropout];
         F2 --> F3[Add & Norm];
@@ -27,7 +27,7 @@ flowchart TD;
         F4 --> F5[Dropout];
         F5 --> F6[Add & Norm];
     end;
-    
+
     subgraph Transformer Block N;
         G1[MultiHead Attention] --> G2[Dropout];
         G2 --> G3[Add & Norm];

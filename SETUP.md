@@ -7,7 +7,7 @@ preprocessing training data and the pre-training/fine-tuning process.
 ## Setup ⚙️
 All required modules for running the code is in the `env.yml` file in the
 *confs* directory. You can create the conda environment with:
-    
+
     conda env create -f confs/env.yml
 
 ## Data Collection 📚
@@ -25,8 +25,8 @@ and another script for tokenizing a dataset using the trained tokenizer
 The `train_bpe.py` script takes an input file containing a list of filepaths to
 text files to be trained on. I used a randomly selected 10% sample of my
 downloaded BooksCorpus dataset (about 1700 books). You can create the required
-input file using the following command: 
-    
+input file using the following command:
+
     find [BookCorpus filepath]/epubtxt -iname "*.txt" | shuf | head -n 1700 >  files.txt
 
 Then the tokenizer can be trained as follows:
@@ -69,7 +69,7 @@ The parameters I used for pretraining are in the `pretrain.yml` file in the
 *confs* directory. All model parameters are the same as mentioned in [Improving
 Language Understanding with Unsupervised Learning][1], with the exception of
 sequence size and batch size. I sequence size to 128 rather than 512, and batch
-size to 32 rather than 64 in order to train on a single GPU. 
+size to 32 rather than 64 in order to train on a single GPU.
 
 ## Text Generation 📝
 Text generation is implemented using top-k sampling and can be performed with

@@ -18,30 +18,30 @@ GPT-1 showcased remarkable capabilities in various natural language processing t
 
 The model's performance was particularly notable in tasks requiring contextual understanding and the generation of coherent, contextually relevant text.
 
-## Implementation
+## Implementation 🛠️
 This repository provides implementation details and resources for GPT-1. Users can utilize this model for various NLP tasks, adapting it to specific requirements and datasets.
 
-### Getting Started
+### Getting Started ➡️
 Instructions on how to set up and run GPT-1 in your environment are provided, along with examples of usage.
 
-### Prerequisites
+### Prerequisites ⚙️
 Details about necessary prerequisites, including software and hardware requirements.
 
-### Installation
+### Installation ⬇️
 Step-by-step guide to installing and configuring GPT-1 on your system.
 
-## Contributing
+## Contributing 🙌
 We welcome contributions from the community. Please refer to the [CONTRIBUTING.md](LINK_TO_YOUR_CONTRIBUTING.MD) for guidelines on how to contribute.
 
-## Versioning
+## Versioning 🔖
 For the versions available, see the [tags on this repository](https://github.com/yourproject/tags).
 
-## Authors and Acknowledgements
+## Authors and Acknowledgements 👥
 - [Your Name] - [Mind-Interfaces/GPT-1/](https://github.com/Mind-Interfaces/GPT-1/)
 - Akshat Pandey - [Pytorch implementation of GPT-1](https://github.com/akshat0123/GPT-1/)
 - Yu Guo - [GPT-1 结构的简单复现](https://github.com/lengyueit/gpt1)
 - Sosuke Kobayashi - [Homemade BookCorpus](https://github.com/soskek/bookcorpus)
 - Acknowledgements to anyone whose resources were used
 
-## License
+## License 📄
 This project is licensed under MIT - see the [LICENSE](LICENSE) file for details.
