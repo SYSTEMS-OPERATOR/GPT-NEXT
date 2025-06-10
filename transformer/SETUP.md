@@ -1,4 +1,4 @@
-## **SETUP & INSTALLATION GUIDE**  
+## **SETUP & INSTALLATION GUIDE** ⚙️
 
 ### **1. System Requirements**  
 - **Python Version**: `Python 3.9+` (Tested with Python 3.11)  

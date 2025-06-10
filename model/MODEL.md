@@ -1,8 +1,8 @@
 `MODEL.md` for GPT-1 `model.py`
 
-# MODEL.md
+# MODEL.md 🧠
 
-## GPT-1 Model Implementation Documentation
+## GPT-1 Model Implementation Documentation 📜
 
 This document provides a comprehensive overview of the `model.py` file used for implementing the GPT-1 model. It includes detailed descriptions of the classes and methods involved, followed by suggested optimizations.
 
