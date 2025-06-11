@@ -1,3 +1,5 @@
+"""ELIZA service providing a simple therapeutic chatbot interface."""
+
 from flask import Flask, request, jsonify, g
 import jwt
 import sys

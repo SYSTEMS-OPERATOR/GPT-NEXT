@@ -1,3 +1,5 @@
+"""Byte-pair tokenizer implementation for training and inference."""
+
 from typing import Tuple, Dict, List
 from collections import defaultdict
 import json, re
@@ -30,30 +32,37 @@ class BytePairTokenizer:
 
 
     def get_sol(self) -> str:
+        """Return the start-of-line token."""
         return self.sol
 
 
     def get_eol(self) -> str:
+        """Return the end-of-line token."""
         return self.eol
 
 
     def get_pad(self) -> str:
+        """Return the padding token."""
         return self.pad
 
 
     def get_unk(self) -> str:
+        """Return the unknown token."""
         return self.unk
 
 
     def get_eow(self) -> str:
+        """Return the end-of-word token."""
         return self.eow
 
 
     def get_byte(self, byte_id: int) -> str:
+        """Return the byte corresponding to ``byte_id``."""
         return self.idx_to_vocab[byte_id]
 
 
     def get_byte_id(self, byte: str) -> int:
+        """Return the identifier for ``byte`` or the unknown token id."""
         unk_id = self.vocab_to_idx[self.unk]
         bid = self.vocab_to_idx[byte] if byte in self.vocab_to_idx else unk_id
         return bid

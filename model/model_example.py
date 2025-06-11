@@ -1,3 +1,5 @@
+"""Demonstration module building a simplified GPT-1 architecture."""
+
 import torch
 import torch.nn as nn
 from torch.nn.init import normal_, zeros_

@@ -1,4 +1,4 @@
-# q-star-o1.py
+"""Prototype for Q* algorithm integrating with GPT for token prediction."""
 import heapq  # For priority queue used in A* algorithm
 import torch
 import torch.nn as nn

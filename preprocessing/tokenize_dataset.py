@@ -1,3 +1,5 @@
+"""Tokenization utilities used to prepare datasets for GPT training."""
+
 from argparse import ArgumentParser
 from multiprocessing import Pool
 from itertools import repeat
@@ -64,6 +66,7 @@ def get_line_ids(line: str, tokenizer: BytePairTokenizer) -> List[int]:
 
 
 def main():
+    """Tokenize an input dataset using a trained tokenizer."""
 
     parser = ArgumentParser()
     parser.add_argument('-c', '--checkpoint', required=True)

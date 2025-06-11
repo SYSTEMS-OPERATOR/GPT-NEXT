@@ -1,3 +1,5 @@
+"""Configuration loader for the Flask-based chatbot services."""
+
 import os
 import json
 # Load environment variables from a .env file if present

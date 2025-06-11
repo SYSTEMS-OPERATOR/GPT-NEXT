@@ -1,4 +1,9 @@
-import argparse, shutil, yaml, os
+"""Training script for GPT models using YAML configuration files."""
+
+import argparse
+import shutil
+import yaml
+import os
 
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader
@@ -37,6 +42,7 @@ def publish_metrics(logger, train_metrics, dev_metrics, epoch):
 
 
 def main():
+    """Execute model training using parameters from a configuration file."""
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--confpath', type=str, required=True)

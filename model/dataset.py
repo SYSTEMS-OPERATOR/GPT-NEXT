@@ -1,3 +1,5 @@
+"""Datasets for handling token ID sequences used during GPT training."""
+
 from random import randint, sample
 
 from torch import FloatTensor, LongTensor, Tensor, stack, cat
@@ -27,6 +29,7 @@ class TokenIDDataset(IterableDataset):
 
 
     def __iter__(self):
+        """Yield one training sample at a time."""
         for line_idx in range(len(self.data)):
 
             line = self.data[line_idx].strip().split(' ')
@@ -40,6 +43,7 @@ class TokenIDDataset(IterableDataset):
 
 
     def __len__(self):
+        """Return the number of lines available for training."""
         return len(self.data)
 
 
@@ -79,8 +83,10 @@ class TokenIDSubset(TokenIDDataset):
 
 
     def __iter__(self):
+        """Iterate over a sampled subset of the dataset."""
         yield from super().__iter__()
 
 
     def __len__(self):
+        """Return the subset length."""
         return super().__len__()

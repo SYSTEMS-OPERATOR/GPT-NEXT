@@ -1,4 +1,4 @@
-# model.py
+"""Neural network modules implementing a GPT-style transformer."""
 from typing import Dict, List
 import torch
 from torch.nn import ModuleList, Embedding, LayerNorm, Dropout, Softmax, \

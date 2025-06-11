@@ -1,9 +1,12 @@
+"""Utility script for training a byte-pair tokenizer."""
+
 from argparse import ArgumentParser
 
 from model.tokenizer import BytePairTokenizer
 
 
 def main():
+    """Train a byte-pair tokenizer on the provided dataset."""
 
     parser = ArgumentParser()
     parser.add_argument('-i', '--inpath', required=True)
