@@ -1,3 +1,5 @@
+"""Alternative transformer implementation with custom attention routines."""
+
 import random
 
 import torch

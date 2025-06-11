@@ -1,1 +1,1 @@
-# Marks the services directory as a Python package
+"""Shared utilities used by the ELIZA and doctor Flask services."""

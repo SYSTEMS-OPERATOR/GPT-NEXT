@@ -1,4 +1,7 @@
-import argparse, yaml
+"""Command-line interface for generating text with a trained GPT model."""
+
+import argparse
+import yaml
 
 from tqdm import trange
 from torch import load
@@ -14,6 +17,7 @@ confpath = 'conf/generate.yml'
 
 
 def main():
+    """Run the text generation utility from the command line."""
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--length', type=int, default=128)

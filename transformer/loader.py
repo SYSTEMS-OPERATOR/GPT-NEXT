@@ -1,3 +1,5 @@
+"""Utilities for loading and transforming models for inference."""
+
 import torch
 import torch.nn as nn
 import safetensors.torch

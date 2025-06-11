@@ -1,4 +1,4 @@
-# q-star.py
+"""Experimental reinforcement learning extensions for GPT."""
 import heapq  # For priority queue used in A* algorithm
 
 import torch

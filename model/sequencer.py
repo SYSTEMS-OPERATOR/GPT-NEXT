@@ -1,3 +1,5 @@
+"""Utilities for generating sequences from a language model."""
+
 from typing import List
 
 from torch import LongTensor, multinomial, Tensor, no_grad, argsort, full, cat

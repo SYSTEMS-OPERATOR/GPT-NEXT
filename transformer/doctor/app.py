@@ -1,3 +1,5 @@
+"""Doctor service exposing a REST API backed by an ELIZA-style chatbot."""
+
 from flask import Flask, request, jsonify, g
 import jwt
 import sys

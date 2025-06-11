@@ -1,3 +1,5 @@
+"""JSON logging helpers for the microservices."""
+
 import logging
 import json
 from datetime import datetime

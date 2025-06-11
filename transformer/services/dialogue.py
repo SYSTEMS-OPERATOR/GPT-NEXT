@@ -1,3 +1,5 @@
+"""Simple rule-based dialogue generator used by the chat services."""
+
 import re
 import random
 

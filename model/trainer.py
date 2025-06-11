@@ -1,3 +1,5 @@
+"""Training utilities managing the optimization loop for GPT models."""
+
 from typing import Dict
 
 from torch import set_grad_enabled, argmax, Tensor
