@@ -1,4 +1,4 @@
-# model.py
+"""Implementation of the core GPT model architecture."""
 from typing import Dict, List
 import torch
 from torch.nn import ModuleList, Embedding, LayerNorm, Dropout, Softmax, \

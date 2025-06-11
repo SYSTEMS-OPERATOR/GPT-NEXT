@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torch.nn.init import normal_, zeros_
 
+"""Illustrative GPT-1 style model with simplified components."""
+
 class GPT1(nn.Module):
     """
     Simplified version of the GPT-1 model with detailed structure and comments.

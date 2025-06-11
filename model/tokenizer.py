@@ -3,6 +3,8 @@ from collections import defaultdict
 import json, re
 
 from nltk import wordpunct_tokenize, sent_tokenize
+
+"""Byte-pair tokenizer implementation and related helpers."""
 from tqdm import trange, tqdm
 
 

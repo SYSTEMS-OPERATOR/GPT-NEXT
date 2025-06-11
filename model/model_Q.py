@@ -3,19 +3,24 @@ import random
 import torch
 import torch.nn as nn
 from config import *
+
+"""Alternative GPT implementation with experimental decoding methods."""
 import copy
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class EmbeddingLayer(nn.Module):
-    def __init__(self, arg,vocab_len):
+    """Token and positional embedding layer."""
+
+    def __init__(self, arg, vocab_len):
         super().__init__()
         self.arg = arg
         self.pos_embedding = nn.Embedding(self.arg.max_len, self.arg.hidden_state)  # 位置编码
         self.token_embedding = nn.Embedding(vocab_len, self.arg.hidden_state)  # 词嵌入
 
     def forward(self, x):
+        """Return the combined token and positional embeddings."""
         seq_len = x.shape[1]
         position = torch.arange(0, seq_len, device=x.device)
         position = position.reshape(1, -1)
@@ -28,7 +33,9 @@ class EmbeddingLayer(nn.Module):
 
 
 class Feed_Forward(nn.Module):
-    def __init__(self,arg):
+    """Simple feed-forward network with residual connection."""
+
+    def __init__(self, arg):
         super().__init__()
         self.arg = arg
         self.linear1 = nn.Linear(self.arg.hidden_state, self.arg.hidden_state * 4)
@@ -38,7 +45,7 @@ class Feed_Forward(nn.Module):
         self.layer_norm = nn.LayerNorm(self.arg.hidden_state)
 
     def forward(self, x):
-        # copy_x = copy.deepcopy(x)
+        """Apply two-layer transformation with residual connection."""
         copy_x = x
         x = self.linear1(x)
         x = self.relu(x)
@@ -50,7 +57,9 @@ class Feed_Forward(nn.Module):
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self,arg):
+    """Multi-head self-attention layer."""
+
+    def __init__(self, arg):
         super().__init__()
         self.arg = arg
         self.Q = nn.Linear(self.arg.hidden_state, self.arg.hidden_state)
@@ -63,6 +72,7 @@ class MultiHeadAttention(nn.Module):
         self.softmax = nn.Softmax(3)
 
     def forward(self, x, mask, pad_mask):
+        """Apply scaled dot-product attention across multiple heads."""
         cur_batch, seq_len, _ = x.shape
         # copy_x = copy.deepcopy(x)
         copy_x = x
@@ -104,7 +114,9 @@ class MultiHeadAttention(nn.Module):
 
 
 class DecoderBlock(nn.Module):
-    def __init__(self,arg):
+    """Single block of decoder consisting of attention and feed-forward."""
+
+    def __init__(self, arg):
         super().__init__()
         self.arg = arg
         self.attention_block1 = MultiHeadAttention(self.arg)
@@ -112,6 +124,7 @@ class DecoderBlock(nn.Module):
         self.feed_forward = Feed_Forward(self.arg)
 
     def forward(self, x, mask, pad_mask):
+        """Run the decoder block over the input tensor."""
         x = self.attention_block1(x, mask, pad_mask)
 
         # 原transformers 无mask的多头注意力机制，GPT没有这一层
@@ -124,6 +137,8 @@ class DecoderBlock(nn.Module):
 
 
 class Decoder(nn.Module):
+    """Stack of decoder blocks with embedding layer."""
+
     def __init__(self, arg, vob_len):
         super().__init__()
         self.arg = arg
@@ -132,6 +147,7 @@ class Decoder(nn.Module):
         self.layers = nn.ModuleList([DecoderBlock(self.arg) for i in range(self.arg.decoder_layer_num)])
 
     def forward(self, x):
+        """Pass input through embedding and decoder blocks."""
         cur_batch, seq_len = x.shape  # [batch_size, seq_length]
 
         # 获取pad mask
@@ -154,6 +170,8 @@ class Decoder(nn.Module):
 
 
 class GPT_Model(nn.Module):
+    """GPT-like model exposing several decoding strategies."""
+
     def __init__(self, arg, vob_len):
         super().__init__()
         self.arg = arg
@@ -163,6 +181,7 @@ class GPT_Model(nn.Module):
         self.loss_fn = nn.CrossEntropyLoss()
 
     def forward(self, x, y=None):
+        """Forward pass returning logits or loss when labels provided."""
         # emb = self.embedding(x)
 
         decoder_out = self.decoder(x)

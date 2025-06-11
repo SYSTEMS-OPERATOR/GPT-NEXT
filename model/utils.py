@@ -1,3 +1,4 @@
+"""Utility classes for tracking metrics during training."""
 
 class RollingCounter:
 

@@ -1,6 +1,7 @@
 # q-star.py
-import heapq  # For priority queue used in A* algorithm
+"""Experimental Q* augmentation for GPT models using search algorithms."""
 
+import heapq  # For priority queue used in A* algorithm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

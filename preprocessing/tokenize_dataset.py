@@ -8,6 +8,8 @@ from tqdm import tqdm
 
 from model.tokenizer import BytePairTokenizer, count_byte_freqs
 
+"""Utilities for tokenizing raw text files into ID sequences."""
+
 
 def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
                   line_length: int) -> None:
@@ -64,6 +66,7 @@ def get_line_ids(line: str, tokenizer: BytePairTokenizer) -> List[int]:
 
 
 def main():
+    """Tokenize a corpus using a trained tokenizer."""
 
     parser = ArgumentParser()
     parser.add_argument('-c', '--checkpoint', required=True)

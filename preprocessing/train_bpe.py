@@ -2,8 +2,11 @@ from argparse import ArgumentParser
 
 from model.tokenizer import BytePairTokenizer
 
+"""Script for training a byte-pair encoding tokenizer."""
+
 
 def main():
+    """Train a byte-pair tokenizer using the provided dataset paths."""
 
     parser = ArgumentParser()
     parser.add_argument('-i', '--inpath', required=True)
