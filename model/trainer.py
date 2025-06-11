@@ -3,6 +3,8 @@ from typing import Dict
 from torch import set_grad_enabled, argmax, Tensor
 from torch.nn.utils import clip_grad_norm_
 from torch.utils.data import DataLoader
+
+"""Training utilities for running epochs and optimization."""
 from tqdm import tqdm
 
 from model.utils import RollingCounter

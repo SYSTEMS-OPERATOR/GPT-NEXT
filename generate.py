@@ -7,11 +7,14 @@ from model.tokenizer import BytePairTokenizer
 from model.sequencer import Sequencer
 from model.model import GPT
 
+"""Utility script for generating text from a trained GPT model."""
+
 
 confpath = 'confs/generate.yml'
 
 
 def main():
+    """Generate a text sequence using a pretrained model."""
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--length', type=int, default=128)

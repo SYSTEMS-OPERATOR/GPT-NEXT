@@ -3,6 +3,8 @@ from typing import List
 from torch import LongTensor, multinomial, Tensor, no_grad, argsort, full, cat
 from torch.nn.functional import softmax
 from torch import long as long_
+
+"""Sequence generation utilities for autoregressive decoding."""
 from tqdm import trange
 
 

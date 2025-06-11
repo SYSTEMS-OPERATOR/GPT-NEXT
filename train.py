@@ -11,8 +11,24 @@ from model.dataset import TokenIDDataset, TokenIDSubset
 from model.trainer import Trainer
 from model.model import GPT
 
+"""Training script for the GPT model.
+
+This module provides utilities for running training epochs and saving
+checkpoints for later use. It exposes a ``main`` function that loads
+configuration files and manages the training loop.
+"""
+
 
 def save_checkpoint(path, model, opt, sch, epoch):
+    """Save a checkpoint of the current training state.
+
+    Args:
+        path (str): Directory to store the checkpoint.
+        model (torch.nn.Module): Model to save.
+        opt (Optimizer): Optimizer whose state to persist.
+        sch (Scheduler): Scheduler whose state to persist.
+        epoch (int): Current epoch number.
+    """
 
     filepath = f'{path}/epoch_{epoch}'
     if os.path.exists(filepath):
@@ -25,6 +41,14 @@ def save_checkpoint(path, model, opt, sch, epoch):
 
 
 def publish_metrics(logger, train_metrics, dev_metrics, epoch):
+    """Publish training and development metrics to TensorBoard.
+
+    Args:
+        logger (SummaryWriter): Logger instance used to write metrics.
+        train_metrics (dict): Dictionary of metrics from the training set.
+        dev_metrics (dict): Dictionary of metrics from the dev set.
+        epoch (int): Current epoch number.
+    """
 
     for key in train_metrics:
         logger.add_scalar(f'train_{key}', train_metrics[key], epoch)
@@ -34,6 +58,7 @@ def publish_metrics(logger, train_metrics, dev_metrics, epoch):
 
 
 def main():
+    """Entry point for training the GPT model."""
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--confpath', type=str, required=True)
