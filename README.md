@@ -30,6 +30,22 @@ Details about necessary prerequisites, including software and hardware requireme
 ### Installation ⬇️
 Step-by-step guide to installing and configuring GPT-1 on your system.
 
+## Seamless Optimization 🌐
+The `RingLoader` in `transformer/loader.py` performs a toroidal
+transformation on model weights. This "wraps" the edges of each 2‑D layer so
+training has no hard boundaries.
+
+```python
+from transformer.loader import RingLoader
+
+loader = RingLoader("model.safetensors")
+loader.load_model()
+loader.apply_ring_transformation()
+loader.recalibrate_model()
+loader.adversarial_defense()
+loader.save_model("optimized_model.safetensors")
+```
+
 ## Contributing 🙌
 We welcome contributions from the community. Please refer to the [CONTRIBUTING.md](LINK_TO_YOUR_CONTRIBUTING.MD) for guidelines on how to contribute.
 
