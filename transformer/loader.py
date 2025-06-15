@@ -1,19 +1,22 @@
 """Utilities for loading and transforming models for inference."""
 
 import torch
-import torch.nn as nn
 import safetensors.torch
-import onnxruntime as ort
-import numpy as np
 from transformers import AutoTokenizer, AutoModel
 
+try:
+    import onnxruntime as ort
+except ImportError:  # pragma: no cover - optional dependency
+    ort = None
+
 class RingLoader:
-    """
-    Seamless Ring Loader for AI Models
-    - Supports seamless concatenation of layer edges to prevent segmentation errors.
-    - Works with Safetensors & ONNX.
-    - Implements adversarial defense mechanisms.
-    - Enables real-time recalibration & ELIZA-based linguistic alignment.
+    """Utility for the **seamless** optimization technique.
+
+    The loader wraps two-dimensional weight matrices into a toroidal ring
+    so opposite edges connect. This removes boundary artifacts and allows a
+    smooth flow of information during fine-tuning. The class can also
+    recalibrate weights, load an ELIZA alignment model and perform basic
+    adversarial checks.
     """
     
     def __init__(self, model_path, model_type='safetensors'):
@@ -24,19 +27,26 @@ class RingLoader:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     def load_model(self):
-        """ Load model based on format (Safetensors or ONNX). """
-        if self.model_type == 'safetensors':
+        """Load model weights.
+
+        Only the ``safetensors`` format is currently supported. Attempting to
+        load an ONNX model will raise ``NotImplementedError`` unless
+        ``onnxruntime`` is available and integration is added.
+        """
+        if self.model_type == "safetensors":
             self.model = safetensors.torch.load_file(self.model_path, device=self.device)
-        elif self.model_type == 'onnx':
+        elif self.model_type == "onnx":
+            if ort is None:
+                raise NotImplementedError("ONNX support requires onnxruntime")
             self.model = ort.InferenceSession(self.model_path)
         else:
             raise ValueError("Unsupported model type")
         print(f"Model {self.model_path} loaded successfully.")
     
     def apply_ring_transformation(self):
-        """
-        Transforms model layers into a seamless ring formation.
-        Prevents boundary effects, ensuring continuous weight flow.
+        """Wrap 2-D weights so edges meet like a donut. 🍩
+
+        This removes discontinuities and enables seamless optimization.
         """
         for key in self.model:
             tensor = self.model[key]
