@@ -91,9 +91,34 @@ class AStarTokenPredictor:
         Returns:
             bool: True if the state is a goal state, False otherwise.
         """
-        # Define goal criteria, e.g., end of sentence, maximum length, etc.
-        # ...
-        pass
+        # Define goal criteria using end-of-sentence token or sequence length
+        eos_id = None
+        if hasattr(self.gpt_model, "tokenizer") and self.gpt_model.tokenizer is not None:
+            eos_id = getattr(self.gpt_model.tokenizer, "eos_token_id", None)
+
+        max_len = getattr(self.gpt_model, "seq", None)
+
+        # If the state provides a last_token method use it, otherwise
+        # fall back to basic list/string handling
+        if hasattr(state, "last_token"):
+            last = state.last_token()
+            length = len(state) if hasattr(state, "__len__") else None
+        else:
+            if isinstance(state, str):
+                tokens = state.split()
+            else:
+                tokens = state
+            last = tokens[-1] if tokens else None
+            length = len(tokens)
+
+        if eos_id is not None and last == eos_id:
+            return True
+        if isinstance(state, str) and state.endswith((".", "!", "?")):
+            return True
+        if max_len is not None and length is not None and length >= max_len:
+            return True
+
+        return False
 
 
 class PriorityQueue:
@@ -118,9 +143,14 @@ class QStarGPT:
     Q*GPT Model: Integrates GPT with Q-learning (Q-Network) and A* token prediction.
     """
     def __init__(self, vocab, seq, n_layers, n_heads, dim, hidden, dropout, device):
+        self.device = device
         self.gpt_model = GPT(vocab, seq, n_layers, n_heads, dim, hidden, dropout, device)
         self.q_network = QNetwork()
         self.a_star_predictor = AStarTokenPredictor(self.gpt_model)
+        self.optimizer = torch.optim.Adam(
+            list(self.gpt_model.parameters()) + list(self.q_network.parameters()),
+            lr=1e-4,
+        )
 
     def generate_text(self, prompt):
         """
@@ -150,9 +180,11 @@ class QStarGPT:
         Args:
             feedback (Tensor): Feedback score from the Q-Network.
         """
-        # Update model parameters or training strategy based on feedback
-        # This could involve adjusting learning rates, changing training data weights, etc.
-        pass
+        # Simple policy gradient style update using the feedback as reward
+        loss = -feedback.mean()
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
     def train(self, data):
         """
@@ -177,9 +209,15 @@ class QStarGPT:
         Returns:
             Tensor: Tensor representation of the text.
         """
-        # Placeholder for text-to-tensor conversion logic
-        # This will depend on your Q-Network's design
-        return torch.tensor([0])  # Example placeholder
+        tokenizer = getattr(self.gpt_model, "tokenizer", None)
+        if tokenizer is not None:
+            token_ids = tokenizer.encode(text)
+        else:
+            token_ids = [ord(c) for c in text]
+        token_tensor = torch.tensor(token_ids, dtype=torch.long).unsqueeze(0).to(self.device)
+        logits, hidden_states = self.gpt_model(token_tensor, ignore=None)
+        last_hidden_state = hidden_states[:, -1, :]
+        return last_hidden_state
 
 
 # Example usage
