@@ -2,11 +2,13 @@
 
 # MODEL.md
 
-## GPT-1 Model Implementation Documentation
+## GPT-1 Model Implementation Documentation 📝
 
 This document provides a comprehensive overview of the `model.py` file used for implementing the GPT-1 model. It includes detailed descriptions of the classes and methods involved, followed by suggested optimizations.
 
-### GPT Class
+For dataset details see [DATASET.md](DATASET.md).
+
+### GPT Class 🧠
 ```python
 class GPT(Module):
     def __init__(self, vocab: int, seq: int, n_layers: int, n_heads: int, 
@@ -30,7 +32,7 @@ class GPT(Module):
         # Forward pass implementation...
 ```
 
-### TransformerBlock Class
+### TransformerBlock Class 🧱
 ```python
 class TransformerBlock(Module):
     def __init__(self, n_heads: int, dim: int, hidden: int, dropout: float,
@@ -48,7 +50,7 @@ class TransformerBlock(Module):
         # Initialization code...
 ```
 
-### MultiHeadAttentionLayer Class
+### MultiHeadAttentionLayer Class 👀
 ```python
 class MultiHeadAttentionLayer(Module):
     def __init__(self, n_heads: int, dim: int, device: str):
@@ -63,7 +65,7 @@ class MultiHeadAttentionLayer(Module):
         # Initialization code...
 ```
 
-### SelfAttentionLayer Class
+### SelfAttentionLayer Class 🔍
 ```python
 class SelfAttentionLayer(Module):
     def __init__(self, d_in: int, d_out: int, device: str):
@@ -78,7 +80,7 @@ class SelfAttentionLayer(Module):
         # Initialization code...
 ```
 
-### FeedForwardLayer Class
+### FeedForwardLayer Class ⚙️
 ```python
 class FeedForwardLayer(Module):
     def __init__(self, d_in: int, d_h: int, device: str):
@@ -93,7 +95,7 @@ class FeedForwardLayer(Module):
         # Initialization code...
 ```
 
-## Suggested Optimizations
+## Suggested Optimizations 🚀
 
 1. **Pre-Layer Normalization**
    - Modify the `TransformerBlock` class to apply layer normalization at the beginning of each sub-block.
@@ -110,9 +112,9 @@ class FeedForwardLayer(Module):
 5. **Weight Initialization Strategy**
    - Experiment with different weight initialization strategies for different layers.
 
-## Code Snippets for Optimizations
+## Code Snippets for Optimizations 💡
 
-### 1. Pre-Layer Normalization
+### 1. Pre-Layer Normalization 🧽
 ```python
 class TransformerBlock(Module):
     # ... Existing code ...
@@ -123,24 +125,24 @@ class TransformerBlock(Module):
         return x + self.drop2(self.ffl(x))
 ```
 
-### 2. Advanced Optimizer (AdamW)
+### 2. Advanced Optimizer (AdamW) ⚡
 ```python
 # In the training script
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 ```
 
-### 3. Learning Rate Scheduling (OneCycle Policy)
+### 3. Learning Rate Scheduling (OneCycle Policy) ⏱️
 ```python
 # In the training script
 scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr, total_steps=total_training_steps)
 ```
 
-### 4. Regularization (Label Smoothing)
+### 4. Regularization (Label Smoothing) 🧴
 ```python
 # Custom loss function with label smoothing support
 ```
 
-### 5. Weight Initialization Strategy
+### 5. Weight Initialization Strategy 🎯
 ```python
 class GPT(Module):
     # ... Existing code ...
