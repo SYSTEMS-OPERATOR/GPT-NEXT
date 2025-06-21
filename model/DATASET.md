@@ -3,11 +3,11 @@
 
 # DATASET.md
 
-## Dataset Implementation for GPT-1
+## Dataset Implementation for GPT-1 📖
 
 This document provides a detailed overview and documentation of the `dataset.py` script used in the GPT-1 implementation. It includes descriptions of the dataset classes and methods, followed by suggested optimizations for future development.
 
-### TokenIDDataset Class
+### TokenIDDataset Class 📜
 ```python
 class TokenIDDataset(IterableDataset):
     def __init__(self, datapath: str, window_size: int, vocab_size: int, 
@@ -28,7 +28,7 @@ class TokenIDDataset(IterableDataset):
         # Iteration implementation...
 ```
 
-### TokenIDSubset Class
+### TokenIDSubset Class ✂️
 ```python
 class TokenIDSubset(TokenIDDataset):
     def __init__(self, dataset: TokenIDDataset, size: int):
@@ -42,7 +42,16 @@ class TokenIDSubset(TokenIDDataset):
         # Initialization code...
 ```
 
-## Suggested Optimizations
+#### Usage Example
+
+```python
+dataset = TokenIDDataset('data/pretrain/train.txt', window_size=128,
+                         vocab_size=39352, unk=39351)
+dataloader = DataLoader(dataset, batch_size=32,
+                        collate_fn=TokenIDDataset.collate)
+```
+
+## Suggested Optimizations 🛠️
 
 1. **Efficient Data Loading**
    - Use lazy loading and efficient data handling techniques to improve memory usage and scalability.
@@ -56,9 +65,9 @@ class TokenIDSubset(TokenIDDataset):
 4. **Parallel Data Processing**
    - Employ parallel processing techniques for faster data preparation and loading.
 
-## Code Snippets for Optimizations
+## Code Snippets for Optimizations 💡
 
-### 1. Efficient Data Loading
+### 1. Efficient Data Loading ⚡
 ```python
 class TokenIDDataset(IterableDataset):
     # ... Existing code ...
@@ -66,7 +75,7 @@ class TokenIDDataset(IterableDataset):
         # Initialize with efficient data loading mechanism
 ```
 
-### 2. Dynamic Window Sizing
+### 2. Dynamic Window Sizing 🔄
 ```python
 class TokenIDDataset(IterableDataset):
     # ... Existing code ...
@@ -74,7 +83,7 @@ class TokenIDDataset(IterableDataset):
         # Implement dynamic window sizing in the iteration method
 ```
 
-### 3. Enhanced Random Sampling
+### 3. Enhanced Random Sampling 🎲
 ```python
 class TokenIDSubset(TokenIDDataset):
     # ... Existing code ...
@@ -82,7 +91,7 @@ class TokenIDSubset(TokenIDDataset):
         # Implement enhanced random sampling in the initialization
 ```
 
-### 4. Parallel Data Processing
+### 4. Parallel Data Processing 🚀
 ```python
 class TokenIDDataset(IterableDataset):
     # ... Existing code ...

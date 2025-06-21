@@ -1,3 +1,7 @@
+## Architecture Overview 🏗️
+
+The diagram below shows the main components of the GPT-1 model.
+
 ```mermaid
 flowchart TD;
     A[Input] -->|Embedding| B[Input Embedding];
@@ -43,3 +47,5 @@ flowchart TD;
         FF2 --> FF3[Linear 2];
     end;
 ```
+
+For a detailed explanation of the implementation, see [model/MODEL.md](model/MODEL.md).
