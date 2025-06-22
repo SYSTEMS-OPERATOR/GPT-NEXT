@@ -17,7 +17,8 @@ class QNetwork(nn.Module):
     def __init__(self):
         super(QNetwork, self).__init__()
         # Define the Q-Network architecture
-        self.fc1 = nn.Linear(768, 512)  # Input size should match GPT output size
+        self.fc1 = nn.Linear(768, 512)
+        # Input size should match GPT output size
         self.fc2 = nn.Linear(512, 256)
         self.fc3 = nn.Linear(256, 1)    # Outputs a single reward score
 
@@ -37,10 +38,12 @@ class QNetwork(nn.Module):
 class AStarTokenPredictor:
     """
     A* Token Predictor for enhancing token prediction in GPT.
-    Uses A* algorithm to choose the next token based on GPT output probabilities and contextual appropriateness.
+    Uses A* algorithm to choose the next token based on GPT output
+    probabilities and contextual appropriateness.
     """
     def __init__(self, gpt_model):
-        self.gpt_model = gpt_model  # GPT model for generating token probabilities
+        self.gpt_model = gpt_model
+        # GPT model for generating token probabilities
 
     def predict_next_token(self, current_state):
         """
@@ -51,7 +54,8 @@ class AStarTokenPredictor:
             Token: The next token predicted by A* algorithm.
         """
         open_set = PriorityQueue()
-        open_set.put((0, current_state))  # Priority queue of states, sorted by cost
+        open_set.put((0, current_state))
+        # Priority queue of states, sorted by cost
 
         while not open_set.empty():
             _, current_state = open_set.get()
@@ -61,7 +65,9 @@ class AStarTokenPredictor:
                 return current_state.last_token()
 
             # Generate possible next tokens and their probabilities
-            possible_tokens = self.gpt_model.generate_next_tokens(current_state)
+            possible_tokens = self.gpt_model.generate_next_tokens(
+                current_state
+            )
 
             for token in possible_tokens:
                 new_state = current_state + token  # Append token to the state
@@ -93,7 +99,10 @@ class AStarTokenPredictor:
         """
         # Define goal criteria using end-of-sentence token or sequence length
         eos_id = None
-        if hasattr(self.gpt_model, "tokenizer") and self.gpt_model.tokenizer is not None:
+        if (
+            hasattr(self.gpt_model, "tokenizer")
+            and self.gpt_model.tokenizer is not None
+        ):
             eos_id = getattr(self.gpt_model.tokenizer, "eos_token_id", None)
 
         max_len = getattr(self.gpt_model, "seq", None)
@@ -140,15 +149,36 @@ class PriorityQueue:
 
 class QStarGPT:
     """
-    Q*GPT Model: Integrates GPT with Q-learning (Q-Network) and A* token prediction.
+    Q*GPT Model: Integrates GPT with Q-learning (Q-Network) and
+    A* token prediction.
     """
-    def __init__(self, vocab, seq, n_layers, n_heads, dim, hidden, dropout, device):
+    def __init__(
+        self,
+        vocab,
+        seq,
+        n_layers,
+        n_heads,
+        dim,
+        hidden,
+        dropout,
+        device,
+    ):
         self.device = device
-        self.gpt_model = GPT(vocab, seq, n_layers, n_heads, dim, hidden, dropout, device)
+        self.gpt_model = GPT(
+            vocab,
+            seq,
+            n_layers,
+            n_heads,
+            dim,
+            hidden,
+            dropout,
+            device,
+        )
         self.q_network = QNetwork()
         self.a_star_predictor = AStarTokenPredictor(self.gpt_model)
         self.optimizer = torch.optim.Adam(
-            list(self.gpt_model.parameters()) + list(self.q_network.parameters()),
+            list(self.gpt_model.parameters())
+            + list(self.q_network.parameters()),
             lr=1e-4,
         )
 
@@ -163,11 +193,17 @@ class QStarGPT:
         current_state = prompt
         generated_text = []
 
-        # Iterate until a stopping condition is met (e.g., end of sentence token)
+        # Iterate until a stopping condition is met
+        # (e.g., end of sentence token)
         while not self.a_star_predictor.is_goal_state(current_state):
             # Obtain next token probabilities from GPT model
-            token_probs = self.gpt_model.get_next_token_probabilities(current_state)
-            next_token = self.a_star_predictor.predict_next_token(current_state, token_probs)
+            token_probs = self.gpt_model.get_next_token_probabilities(
+                current_state
+            )
+            next_token = self.a_star_predictor.predict_next_token(
+                current_state,
+                token_probs,
+            )
             generated_text.append(next_token)
             current_state += next_token
 
@@ -176,7 +212,8 @@ class QStarGPT:
     def update_model(self, feedback):
         """
         Updates the GPT model based on feedback from the Q-Network.
-        This method should be implemented based on the specific way you want to update the GPT model.
+        This method should be implemented based on the specific way you want to
+        update the GPT model.
         Args:
             feedback (Tensor): Feedback score from the Q-Network.
         """
@@ -194,8 +231,10 @@ class QStarGPT:
         """
         for batch in data:
             generated_text = self.generate_text(batch['prompt'])
-            # Convert generated text to a tensor for processing by the Q-network
-            # This conversion will depend on how your Q-network expects the input
+            # Convert generated text to a tensor for processing by the
+            # Q-network
+            # This conversion will depend on how your Q-network
+            # expects the input
             text_tensor = self.convert_text_to_tensor(generated_text)
             reward_score = self.q_network(text_tensor)
             self.update_model(reward_score)
@@ -203,7 +242,8 @@ class QStarGPT:
     def convert_text_to_tensor(self, text):
         """
         Converts text to a tensor format suitable for the Q-Network.
-        This method should be implemented based on your Q-Network's input requirements.
+        This method should be implemented based on your Q-Network's
+        input requirements.
         Args:
             text (str): The generated text.
         Returns:
@@ -214,7 +254,11 @@ class QStarGPT:
             token_ids = tokenizer.encode(text)
         else:
             token_ids = [ord(c) for c in text]
-        token_tensor = torch.tensor(token_ids, dtype=torch.long).unsqueeze(0).to(self.device)
+        token_tensor = (
+            torch.tensor(token_ids, dtype=torch.long)
+            .unsqueeze(0)
+            .to(self.device)
+        )
         logits, hidden_states = self.gpt_model(token_tensor, ignore=None)
         last_hidden_state = hidden_states[:, -1, :]
         return last_hidden_state

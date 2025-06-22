@@ -11,8 +11,14 @@ from tqdm import trange
 class Sequencer:
 
 
-    def __init__(self, model: 'Model', tokenizer: 'Tokenizer', window_size: int, 
-                 k: int, device: str):
+    def __init__(
+        self,
+        model: 'Model',
+        tokenizer: 'Tokenizer',
+        window_size: int,
+        k: int,
+        device: str,
+    ):
         """ Initialize sequencer
 
         Args:
@@ -56,7 +62,10 @@ class Sequencer:
         return self.generate_text(tokens)
 
 
-    def generate_start_seq(self, start: str=None) -> (List[str], Tensor, Tensor):
+    def generate_start_seq(
+        self,
+        start: str | None = None,
+    ) -> tuple[list[str], Tensor, Tensor]:
         """ Generate initial starting sequence of tokens, token ids, and ids to
             ignore (padding / unknowns etc)
 
@@ -73,13 +82,14 @@ class Sequencer:
         tokens = [self.tokenizer.get_sol()]
 
         if start:
-
-            chunks = string.split(" ")
+            chunks = start.split(" ")
             for chunk in chunks:
                 bytes_ = list(chunk) + [self.tokenizer.get_eow()]
                 tokens += self.tokenizer.merge_bytes(bytes_)
 
-        token_ids = LongTensor(self.tokenizer.get_byte_ids(tokens)).unsqueeze(0)
+        token_ids = LongTensor(
+            self.tokenizer.get_byte_ids(tokens)
+        ).unsqueeze(0)
         token_ids = token_ids.to(device=self.device)
         token_ids = self.pad_token_ids(token_ids, pad_id)
         ignore_ids = (token_ids==pad_id).float().to(device=self.device) 
@@ -103,7 +113,10 @@ class Sequencer:
 
         pad_id = self.tokenizer.get_byte_id(self.tokenizer.get_pad())
         if idx < self.window_size-1:
-            token_ids = cat([token_ids[:, :idx+1], next_id.unsqueeze(0)], dim=1)
+            token_ids = cat(
+                [token_ids[:, : idx + 1], next_id.unsqueeze(0)],
+                dim=1,
+            )
             token_ids = self.pad_token_ids(token_ids, pad_id)
             ignore_ids = (token_ids==pad_id).float() 
             idx += 1

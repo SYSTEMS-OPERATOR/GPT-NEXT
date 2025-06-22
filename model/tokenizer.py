@@ -156,11 +156,29 @@ class BytePairTokenizer:
         with open(f'{path}/freqs.json', 'w', encoding='utf-8') as outfile:
             json.dump(self.freqs, outfile, indent=4, ensure_ascii=False)
 
-        with open(f'{path}/vocab_to_idx.json', 'w', encoding='utf-8') as outfile:
-            json.dump(self.vocab_to_idx, outfile, indent=4, ensure_ascii=False)
+        with open(
+            f'{path}/vocab_to_idx.json',
+            'w',
+            encoding='utf-8',
+        ) as outfile:
+            json.dump(
+                self.vocab_to_idx,
+                outfile,
+                indent=4,
+                ensure_ascii=False,
+            )
 
-        with open(f'{path}/idx_to_vocab.json', 'w', encoding='utf-8') as outfile:
-            json.dump(self.idx_to_vocab, outfile, indent=4, ensure_ascii=False)
+        with open(
+            f'{path}/idx_to_vocab.json',
+            'w',
+            encoding='utf-8',
+        ) as outfile:
+            json.dump(
+                self.idx_to_vocab,
+                outfile,
+                indent=4,
+                ensure_ascii=False,
+            )
 
 
     @staticmethod
@@ -169,10 +187,18 @@ class BytePairTokenizer:
         with open(f'{path}/freqs.json', 'r', encoding='utf-8') as infile:
             freqs = json.load(infile)
 
-        with open(f'{path}/vocab_to_idx.json', 'r', encoding='utf-8') as infile:
+        with open(
+            f'{path}/vocab_to_idx.json',
+            'r',
+            encoding='utf-8',
+        ) as infile:
             vocab_to_idx = json.load(infile)
 
-        with open(f'{path}/idx_to_vocab.json', 'r', encoding='utf-8') as infile:
+        with open(
+            f'{path}/idx_to_vocab.json',
+            'r',
+            encoding='utf-8',
+        ) as infile:
             idx_to_vocab = json.load(infile)
 
         return BytePairTokenizer(freqs, vocab_to_idx, idx_to_vocab)
@@ -217,7 +243,8 @@ def create_vocab(filepaths: List[str]) -> Dict[str, int]:
         filepaths: list of filepaths to collect vocabulary from
 
     Returns:
-        (Dict[str, int]): dictionary mapping vocabulary terms to their frequency 
+        (Dict[str, int]): dictionary mapping vocabulary terms to their
+            frequency
     """
 
     vocab = defaultdict(int)
@@ -250,8 +277,8 @@ def truncate_vocab(vocab: Dict[str, int], mincount: int) -> None:
 
 
 def prepare_bpe_vocab(vocab: Dict[str, int]) -> Dict[str, int]:
-    """ Prepare vocabulary frequency dictionary for byte-pair generation.
-        End-of-word byte '</w>' added to words, every character separated by space
+    """Prepare vocabulary frequency dictionary for byte-pair generation.
+    End-of-word byte '</w>' added to words, every character separated by space
 
     Args:
         vocab: vocabulary frequency dictionary to prepare
@@ -336,7 +363,9 @@ def count_byte_freqs(vocab: Dict[str, int]) -> Dict[str, int]:
     return freqs
 
 
-def create_vocab_maps(freqs: Dict[str, int]) -> (Dict[str, int], Dict[int, str]):
+def create_vocab_maps(
+    freqs: Dict[str, int],
+) -> tuple[Dict[str, int], Dict[int, str]]:
     """ Create map of vocabulary terms to indices and vice versa. Word indices
         are in order of their frequency in the provided vocabulary 
 

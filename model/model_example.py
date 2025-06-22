@@ -16,7 +16,16 @@ class GPT1(nn.Module):
         d_ff (int): Dimension of the feed-forward network.
         dropout_rate (float): Dropout rate.
     """
-    def __init__(self, vocab_size, max_seq_len, n_layers=12, n_heads=12, d_model=768, d_ff=3072, dropout_rate=0.1):
+    def __init__(
+        self,
+        vocab_size,
+        max_seq_len,
+        n_layers=12,
+        n_heads=12,
+        d_model=768,
+        d_ff=3072,
+        dropout_rate=0.1,
+    ):
         super(GPT1, self).__init__()
 
         self.token_embeddings = nn.Embedding(vocab_size, d_model)
@@ -48,7 +57,11 @@ class GPT1(nn.Module):
         Returns:
             Tensor: Output tensor.
         """
-        positions = torch.arange(0, x.size(1)).expand(x.size(0), x.size(1)).to(x.device)
+        positions = (
+            torch.arange(0, x.size(1))
+            .expand(x.size(0), x.size(1))
+            .to(x.device)
+        )
         x = self.token_embeddings(x) + self.position_embeddings(positions)
 
         for layer in self.layers:
@@ -59,7 +72,8 @@ class GPT1(nn.Module):
 
 class TransformerBlock(nn.Module):
     """
-    Transformer block consisting of multi-head attention and feed-forward layers.
+    Transformer block consisting of multi-head attention and
+    feed-forward layers.
     Args:
         d_model (int): Dimension of the model.
         n_heads (int): Number of attention heads.
@@ -134,13 +148,20 @@ class MultiHeadAttention(nn.Module):
         q = q.transpose(1,2)
         v = v.transpose(1,2)
 
-        scores = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(torch.tensor(self.d_k, dtype=torch.float32))
+        scores = (
+            torch.matmul(q, k.transpose(-2, -1))
+            / torch.sqrt(torch.tensor(self.d_k, dtype=torch.float32))
+        )
         attn = nn.Softmax(dim=-1)(scores)
         attn = self.dropout(attn)
         context = torch.matmul(attn, v)
 
         # Concatenate heads and put through final linear layer
-        context = context.transpose(1, 2).contiguous().view(bs, -1, self.d_k * self.h)
+        context = (
+            context.transpose(1, 2)
+            .contiguous()
+            .view(bs, -1, self.d_k * self.h)
+        )
         output = self.out(context)
 
         return output

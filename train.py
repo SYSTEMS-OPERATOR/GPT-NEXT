@@ -93,8 +93,16 @@ def main():
         dev = TokenIDSubset(dev_data, **confs['dev_subset'])
 
         collate = TokenIDDataset.collate
-        tloader = DataLoader(collate_fn=collate, **confs['loader'], dataset=train)
-        dloader = DataLoader(collate_fn=collate, **confs['loader'], dataset=dev)
+        tloader = DataLoader(
+            collate_fn=collate,
+            **confs['loader'],
+            dataset=train,
+        )
+        dloader = DataLoader(
+            collate_fn=collate,
+            **confs['loader'],
+            dataset=dev,
+        )
 
         train_metrics = trainer.run_epoch(tloader)
         dev_metrics = trainer.run_epoch(dloader, train_mode=False)
