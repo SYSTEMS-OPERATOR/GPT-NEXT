@@ -32,7 +32,11 @@ class Trainer:
         self.sch = sch
         
 
-    def run_epoch(self, loader: DataLoader, train_mode: bool=True) -> Dict[str, int]:
+    def run_epoch(
+        self,
+        loader: DataLoader,
+        train_mode: bool = True,
+    ) -> Dict[str, int]:
         """ Run a single epoch of training
 
         Args:

@@ -7,8 +7,18 @@ from torch import LongTensor, Tensor, einsum, ones, sqrt, tril, triu, cat
 from torch.nn.init import normal_, ones_, zeros_
 
 class GPT(Module):
-    def __init__(self, vocab: int, seq: int, n_layers: int, n_heads: int, 
-                 dim: int, hidden: int, dropout: float, device: str, tokenizer=None):
+    def __init__(
+        self,
+        vocab: int,
+        seq: int,
+        n_layers: int,
+        n_heads: int,
+        dim: int,
+        hidden: int,
+        dropout: float,
+        device: str,
+        tokenizer=None,
+    ):
         """ Initialize GPT-1 replica module
 
         Args:
@@ -28,7 +38,8 @@ class GPT(Module):
         self.seq = seq
         self.bpe_embed = Embedding(vocab, dim).to(device)
         self.pos_embed = Embedding(seq, dim).to(device)
-        self.pos = torch.arange(seq, device=device).unsqueeze(0)  # Adjusted for dynamic sequence length
+        self.pos = torch.arange(seq, device=device).unsqueeze(0)
+        # Adjusted for dynamic sequence length
         self.blocks = ModuleList([
             TransformerBlock(n_heads, dim, hidden, dropout, device) \
             for _ in range(n_layers)
@@ -77,7 +88,10 @@ class GPT(Module):
         """
         self.eval()  # Set model to evaluation mode
         with torch.no_grad():
-            x = torch.tensor(sequence, dtype=torch.long, device=self.device).unsqueeze(0)
+            x = (
+                torch.tensor(sequence, dtype=torch.long, device=self.device)
+                .unsqueeze(0)
+            )
             logits, _ = self.forward(x)
             logits = logits[:, -1, :]  # Get logits for the last token
             probs = torch.softmax(logits, dim=-1).squeeze(0)
@@ -191,7 +205,9 @@ class SelfAttentionLayer(Module):
         att = einsum('bqd,bkd->bqk', q, k)
         att /= self.scale
         seq_length = x.size(1)
-        causal_mask = torch.tril(torch.ones((seq_length, seq_length), device=self.device))
+        causal_mask = torch.tril(
+            torch.ones((seq_length, seq_length), device=self.device)
+        )
         if ignore is not None:
             ignore_mask = self.get_ignore_mask(att, ignore)
             mask = causal_mask.unsqueeze(0) * ignore_mask

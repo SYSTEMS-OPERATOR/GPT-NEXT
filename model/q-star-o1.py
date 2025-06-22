@@ -17,7 +17,8 @@ class QNetwork(nn.Module):
     def __init__(self, input_size):
         super(QNetwork, self).__init__()
         # Define the Q-Network architecture
-        self.fc1 = nn.Linear(input_size, 512)  # Input size should match GPT output size
+        self.fc1 = nn.Linear(input_size, 512)
+        # Input size should match GPT output size
         self.fc2 = nn.Linear(512, 256)
         self.fc3 = nn.Linear(256, 1)    # Outputs a single reward score
 
@@ -37,10 +38,12 @@ class QNetwork(nn.Module):
 class AStarTokenPredictor:
     """
     A* Token Predictor for enhancing token prediction in GPT.
-    Uses A* algorithm to choose the next token based on GPT output probabilities and contextual appropriateness.
+    Uses A* algorithm to choose the next token based on GPT output
+    probabilities and contextual appropriateness.
     """
     def __init__(self, gpt_model, vocab_size, max_length):
-        self.gpt_model = gpt_model  # GPT model for generating token probabilities
+        self.gpt_model = gpt_model
+        # GPT model for generating token probabilities
         self.vocab_size = vocab_size
         self.max_length = max_length
 
@@ -53,7 +56,8 @@ class AStarTokenPredictor:
             int: The next token ID predicted by A* algorithm.
         """
         open_set = PriorityQueue()
-        # The priority queue contains tuples of (estimated total cost, current_cost, sequence)
+        # The priority queue contains tuples of
+        # (estimated total cost, current_cost, sequence)
         initial_cost = 0
         estimated_total_cost = self.heuristic(current_sequence)
         open_set.put((estimated_total_cost, initial_cost, current_sequence))
@@ -88,7 +92,8 @@ class AStarTokenPredictor:
             float: Cost associated with the next token.
         """
         # Negative log probability as cost
-        return -torch.log(torch.tensor(probability + 1e-8)).item()  # Add epsilon to avoid log(0)
+        # Add epsilon to avoid log(0)
+        return -torch.log(torch.tensor(probability + 1e-8)).item()
 
     def heuristic(self, sequence):
         """
@@ -134,18 +139,44 @@ class PriorityQueue:
 
 class QStarGPT:
     """
-    Q*GPT Model: Integrates GPT with Q-learning (Q-Network) and A* token prediction.
+    Q*GPT Model: Integrates GPT with Q-learning (Q-Network) and
+    A* token prediction.
     """
-    def __init__(self, vocab_size, seq_length, n_layers, n_heads, dim, hidden, dropout, device):
+    def __init__(
+        self,
+        vocab_size,
+        seq_length,
+        n_layers,
+        n_heads,
+        dim,
+        hidden,
+        dropout,
+        device,
+    ):
         self.device = device
-        self.gpt_model = GPT(vocab_size, seq_length, n_layers, n_heads, dim, hidden, dropout, device).to(device)
+        self.gpt_model = GPT(
+            vocab_size,
+            seq_length,
+            n_layers,
+            n_heads,
+            dim,
+            hidden,
+            dropout,
+            device,
+        ).to(device)
         self.q_network = QNetwork(input_size=dim).to(device)
-        self.a_star_predictor = AStarTokenPredictor(self.gpt_model, vocab_size, seq_length)
+        self.a_star_predictor = AStarTokenPredictor(
+            self.gpt_model,
+            vocab_size,
+            seq_length,
+        )
         # Assume the tokenizer is defined elsewhere or within the GPT model
-        self.tokenizer = self.gpt_model.tokenizer  # Replace with actual tokenizer
+        self.tokenizer = self.gpt_model.tokenizer
+        # Replace with actual tokenizer
         # Initialize optimizer
         self.optimizer = torch.optim.Adam(
-            list(self.gpt_model.parameters()) + list(self.q_network.parameters()),
+            list(self.gpt_model.parameters())
+            + list(self.q_network.parameters()),
             lr=1e-4
         )
 
@@ -161,13 +192,18 @@ class QStarGPT:
         current_sequence = self.tokenizer.encode(prompt)
         generated_sequence = current_sequence.copy()
 
-        # Iterate until a stopping condition is met (e.g., end of sentence token)
+        # Iterate until a stopping condition is met
+        # (e.g., end of sentence token)
         while not self.a_star_predictor.is_goal_state(generated_sequence):
-            next_token_id = self.a_star_predictor.predict_next_token(generated_sequence)
+            next_token_id = self.a_star_predictor.predict_next_token(
+                generated_sequence
+            )
             generated_sequence.append(next_token_id)
 
         # Convert token IDs back to text
-        generated_text_str = self.tokenizer.decode(generated_sequence[len(current_sequence):])
+        generated_text_str = self.tokenizer.decode(
+            generated_sequence[len(current_sequence) :]
+        )
         return generated_text_str
 
     def update_model(self, token_tensor, reward_score):
@@ -194,7 +230,8 @@ class QStarGPT:
             prompt = batch['prompt']
             # Generate text using the current model
             generated_text = self.generate_text(prompt)
-            # Convert generated text to a tensor for processing by the Q-network
+            # Convert generated text to a tensor for processing by the
+            # Q-network
             token_tensor = self.convert_text_to_tensor(generated_text)
             # Get the reward score from the Q-network
             reward_score = self.q_network(token_tensor)
@@ -212,7 +249,11 @@ class QStarGPT:
         # Convert text to token IDs
         token_ids = self.tokenizer.encode(text)
         # Convert to tensor and move to device
-        token_tensor = torch.tensor(token_ids, dtype=torch.long).unsqueeze(0).to(self.device)
+        token_tensor = (
+            torch.tensor(token_ids, dtype=torch.long)
+            .unsqueeze(0)
+            .to(self.device)
+        )
         # Get the hidden states from the GPT model
         logits, hidden_states = self.gpt_model(token_tensor, ignore=None)
         # Take the last hidden state
@@ -224,6 +265,16 @@ if __name__ == "__main__":
     vocab_size = 10000  # Example vocabulary size
     seq_length = 128    # Example sequence length
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    q_star_gpt = QStarGPT(vocab_size, seq_length, 12, 12, 768, 3072, 0.1, device)
-    training_data = [{'prompt': 'Example prompt'}]  # Placeholder for training data
+    q_star_gpt = QStarGPT(
+        vocab_size,
+        seq_length,
+        12,
+        12,
+        768,
+        3072,
+        0.1,
+        device,
+    )
+    training_data = [{'prompt': 'Example prompt'}]
+    # Placeholder for training data
     q_star_gpt.train(training_data)

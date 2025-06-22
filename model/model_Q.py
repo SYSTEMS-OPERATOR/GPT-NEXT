@@ -16,8 +16,14 @@ class EmbeddingLayer(nn.Module):
     def __init__(self, arg, vocab_len):
         super().__init__()
         self.arg = arg
-        self.pos_embedding = nn.Embedding(self.arg.max_len, self.arg.hidden_state)  # 位置编码
-        self.token_embedding = nn.Embedding(vocab_len, self.arg.hidden_state)  # 词嵌入
+        self.pos_embedding = nn.Embedding(
+            self.arg.max_len,
+            self.arg.hidden_state,
+        )  # 位置编码
+        self.token_embedding = nn.Embedding(
+            vocab_len,
+            self.arg.hidden_state,
+        )  # 词嵌入
 
     def forward(self, x):
         """Return the combined token and positional embeddings."""
@@ -38,9 +44,15 @@ class Feed_Forward(nn.Module):
     def __init__(self, arg):
         super().__init__()
         self.arg = arg
-        self.linear1 = nn.Linear(self.arg.hidden_state, self.arg.hidden_state * 4)
+        self.linear1 = nn.Linear(
+            self.arg.hidden_state,
+            self.arg.hidden_state * 4,
+        )
         self.relu = nn.GELU()
-        self.linear2 = nn.Linear(self.arg.hidden_state * 4, self.arg.hidden_state)
+        self.linear2 = nn.Linear(
+            self.arg.hidden_state * 4,
+            self.arg.hidden_state,
+        )
 
         self.layer_norm = nn.LayerNorm(self.arg.hidden_state)
 
@@ -94,7 +106,9 @@ class MultiHeadAttention(nn.Module):
         # weight = torch.mean(x, dim=-1, keepdim=True)
 
         # QK的T
-        weight = q @ k.transpose(-1, -2) / torch.sqrt(torch.tensor(self.arg.hidden_state))
+        weight = (
+            q @ k.transpose(-1, -2)
+        ) / torch.sqrt(torch.tensor(self.arg.hidden_state))
         weight.masked_fill_(mask, -1e9)
 
         score = self.softmax(weight)
@@ -144,7 +158,10 @@ class Decoder(nn.Module):
         self.arg = arg
         self.embedding = EmbeddingLayer(self.arg,vob_len)
         # self.layers = nn.Sequential(*[DecoderBlock() for i in range(3)])
-        self.layers = nn.ModuleList([DecoderBlock(self.arg) for i in range(self.arg.decoder_layer_num)])
+        self.layers = nn.ModuleList([
+            DecoderBlock(self.arg)
+            for i in range(self.arg.decoder_layer_num)
+        ])
 
     def forward(self, x):
         """Pass input through embedding and decoder blocks."""
@@ -155,12 +172,23 @@ class Decoder(nn.Module):
 
         # pad_mask 拆头
         pad_mask = pad_mask.unsqueeze(1)  # [batch_size,1, seq_length, 1]
-        pad_mask = pad_mask.expand(cur_batch, 1, seq_len, seq_len)  # [batch_size,1, seq_length, seq_length]
-        pad_mask = pad_mask.repeat(1, self.arg.head_num, 1, 1)  # [batch_size,attn_head_num, seq_length, seq_length]
+        pad_mask = pad_mask.expand(
+            cur_batch,
+            1,
+            seq_len,
+            seq_len,
+        )  # [batch_size,1, seq_length, seq_length]
+        pad_mask = pad_mask.repeat(
+            1,
+            self.arg.head_num,
+            1,
+            1,
+        )  # [batch_size,attn_head_num, seq_length, seq_length]
 
         # look ahead masks
-        look_ahead_mask = torch.triu(torch.ones_like(pad_mask), 1).to(
-            x.device)  # [batch_size,attn_head_num, seq_length, seq_length] 每一个头都为相同的下三角矩阵
+        look_ahead_mask = torch.triu(torch.ones_like(pad_mask), 1).to(x.device)
+        # [batch_size,attn_head_num, seq_length, seq_length]
+        # 每一个头都为相同的下三角矩阵
         mask = (pad_mask + look_ahead_mask) >= 1
 
         emb = self.embedding(x)
@@ -198,7 +226,10 @@ class GPT_Model(nn.Module):
             pre = self.forward(x)
             pre = torch.argmax(pre, dim=-1)
             pre = int(pre[0][-1])
-            x = torch.cat([x, torch.tensor([[pre]], dtype=x.dtype, device=device)], dim=-1)
+            x = torch.cat(
+                [x, torch.tensor([[pre]], dtype=x.dtype, device=device)],
+                dim=-1,
+            )
 
             if pre == 2:
                 break
@@ -210,7 +241,10 @@ class GPT_Model(nn.Module):
             _, indexes = torch.sort(pre)
             topk_list = indexes[0][-1].tolist()[::-1][:self.arg.top_k]
             pre = random.choice(topk_list)
-            x = torch.cat([x, torch.tensor([[pre]], dtype=x.dtype, device=device)], dim=-1)
+            x = torch.cat(
+                [x, torch.tensor([[pre]], dtype=x.dtype, device=device)],
+                dim=-1,
+            )
 
             if pre == 2:
                 break
@@ -230,14 +264,23 @@ class GPT_Model(nn.Module):
             topk_weight_list = weight[0][-1].tolist()[:self.arg.top_k]
 
             # 利用概率分布 构造轮盘
-            topk_weight_list = nn.Softmax(-1).forward(torch.tensor(topk_weight_list))
+            topk_weight_list = nn.Softmax(-1).forward(
+                torch.tensor(topk_weight_list)
+            )
             topk_weight_list = [int(i * 20) for i in topk_weight_list]
 
             topk_idx_list = idx[0][-1].tolist()[:self.arg.top_k]
 
-            random_list = [i for i, times in zip(topk_idx_list, topk_weight_list) for j in range(times)]
+            random_list = [
+                i
+                for i, times in zip(topk_idx_list, topk_weight_list)
+                for j in range(times)
+            ]
             pre = random.choice(random_list)
-            x = torch.cat([x, torch.tensor([[pre]], dtype=x.dtype, device=device)], dim=-1)
+            x = torch.cat(
+                [x, torch.tensor([[pre]], dtype=x.dtype, device=device)],
+                dim=-1,
+            )
 
             if pre == 2:
                 break
