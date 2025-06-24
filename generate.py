@@ -10,7 +10,7 @@ from model.model import GPT
 """Utility script for generating text from a trained GPT model."""
 
 
-confpath = 'confs/generate.yml'
+confpath = 'conf/generate.yml'
 
 
 def main():
