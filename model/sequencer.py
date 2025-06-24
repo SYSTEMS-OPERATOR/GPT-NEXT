@@ -52,7 +52,7 @@ class Sequencer:
         self.model.eval()
         with no_grad():
             for i in trange(length):
-                probs = self.model(token_ids, ignore_ids)
+                probs, _ = self.model(token_ids, ignore_ids)
                 next_id = self.gen_next_token(probs, idx)
                 tokens.append(self.tokenizer.get_byte(str(next_id.item())))
                 token_ids, ignore_ids, idx = self.update_token_ids(
