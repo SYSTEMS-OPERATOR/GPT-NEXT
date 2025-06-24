@@ -54,7 +54,7 @@ def publish_metrics(logger, train_metrics, dev_metrics, epoch):
         logger.add_scalar(f'train_{key}', train_metrics[key], epoch)
 
     for key in dev_metrics:
-        logger.add_scalar(f'dev_{key}', train_metrics[key], epoch)
+        logger.add_scalar(f'dev_{key}', dev_metrics[key], epoch)
 
 
 def main():
