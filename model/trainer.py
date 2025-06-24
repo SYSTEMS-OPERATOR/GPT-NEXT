@@ -94,7 +94,7 @@ class Trainer:
             self.model.zero_grad()
             self.opt.zero_grad()
 
-        y_pred = self.model(x, ignore)
+        y_pred, _ = self.model(x, ignore)
         y_pred = y_pred.view(-1, y_pred.size(-1))
         y = y.view(-1)
         loss = self.crit(y_pred, y)
