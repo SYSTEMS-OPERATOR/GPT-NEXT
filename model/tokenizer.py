@@ -2,10 +2,23 @@ from typing import Tuple, Dict, List
 from collections import defaultdict
 import json, re
 
-from nltk import wordpunct_tokenize, sent_tokenize
+try:
+    from nltk import wordpunct_tokenize, sent_tokenize
+except ModuleNotFoundError:  # pragma: no cover - fallback if nltk missing
+    def wordpunct_tokenize(text):
+        return []
+
+    def sent_tokenize(text):
+        return []
 
 """Byte-pair tokenizer implementation and related helpers."""
-from tqdm import trange, tqdm
+try:
+    from tqdm import trange, tqdm
+except ModuleNotFoundError:  # pragma: no cover - fallback if tqdm missing
+    trange = range
+
+    def tqdm(x, **k):
+        return x
 
 
 class BytePairTokenizer:
