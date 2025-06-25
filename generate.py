@@ -1,10 +1,13 @@
 """Command-line interface for generating text with a trained GPT model."""
 
 import argparse
-import yaml
 
-from tqdm import trange
-from torch import load
+from miniyaml import load as load_yaml
+
+try:
+    from torch import load
+except ModuleNotFoundError as exc:
+    raise SystemExit("PyTorch is required to run this script") from exc
 
 from model.tokenizer import BytePairTokenizer
 from model.sequencer import Sequencer
@@ -24,7 +27,7 @@ def main():
     args = parser.parse_args()
     length = args.length
 
-    confs = yaml.safe_load(open(confpath))
+    confs = load_yaml(confpath)
     model = GPT(**confs['model'])
     model.load_state_dict(load(confs['pretrained_model'])) 
     tokenizer = BytePairTokenizer.load(confs['trained_tokenizer'])
