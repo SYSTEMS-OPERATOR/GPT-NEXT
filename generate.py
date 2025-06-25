@@ -1,11 +1,25 @@
-import argparse, yaml
+import argparse
+import types
 
-from tqdm import trange
-from torch import load
+try:
+    import yaml  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - fallback for missing PyYAML
+    from minimal_yaml import safe_load
+    yaml = types.SimpleNamespace(safe_load=safe_load)
 
-from model.tokenizer import BytePairTokenizer
-from model.sequencer import Sequencer
-from model.model import GPT
+try:
+    from tqdm import trange
+except ModuleNotFoundError:  # pragma: no cover - fallback if tqdm missing
+    trange = range
+
+try:
+    from torch import load
+    MISSING_TORCH = False
+except ModuleNotFoundError:  # pragma: no cover - allow running without torch
+    MISSING_TORCH = True
+    def load(*a, **k):
+        raise RuntimeError('PyTorch is required to load models')
+
 
 """Utility script for generating text from a trained GPT model."""
 
@@ -20,6 +34,14 @@ def main():
     parser.add_argument('-l', '--length', type=int, default=128)
     args = parser.parse_args()
     length = args.length
+
+    if MISSING_TORCH:  # pragma: no cover - informative exit
+        print('PyTorch is required to run generation. Please install torch.')
+        return
+
+    from model.tokenizer import BytePairTokenizer
+    from model.sequencer import Sequencer
+    from model.model import GPT
 
     confs = yaml.safe_load(open(confpath))
     model = GPT(**confs['model'])

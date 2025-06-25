@@ -1,15 +1,38 @@
-import argparse, shutil, yaml, os
+import argparse
+import shutil
+import os
+import types
 
-from torch.optim.lr_scheduler import OneCycleLR
-from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
-from torch.nn import CrossEntropyLoss
-from torch import load, ones, save
-from torch.optim import AdamW
+try:
+    import yaml  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - fallback for missing PyYAML
+    from minimal_yaml import safe_load
+    yaml = types.SimpleNamespace(safe_load=safe_load)
 
-from model.dataset import TokenIDDataset, TokenIDSubset
-from model.trainer import Trainer
-from model.model import GPT
+try:
+    from torch.optim.lr_scheduler import OneCycleLR
+    from torch.utils.data import DataLoader
+    from torch.nn import CrossEntropyLoss
+    from torch import load, ones, save
+    from torch.optim import AdamW
+    MISSING_TORCH = False
+except ModuleNotFoundError:  # pragma: no cover - allow running without torch
+    OneCycleLR = DataLoader = CrossEntropyLoss = load = ones = save = AdamW = None
+    MISSING_TORCH = True
+
+try:
+    from tensorboardX import SummaryWriter
+except ModuleNotFoundError:  # pragma: no cover - fallback if tensorboardX missing
+    try:
+        from torch.utils.tensorboard import SummaryWriter  # type: ignore
+    except Exception:
+        class SummaryWriter:  # type: ignore
+            def __init__(self, *a, **k):
+                pass
+
+            def add_scalar(self, *a, **k):
+                pass
+
 
 """Training script for the GPT model.
 
@@ -66,6 +89,14 @@ def main():
     args = parser.parse_args()
     confpath = args.confpath
     checkpoint = args.checkpoint
+
+    if MISSING_TORCH:  # pragma: no cover - informative exit if torch missing
+        print('PyTorch is required to run training. Please install torch.')
+        return
+
+    from model.dataset import TokenIDDataset, TokenIDSubset
+    from model.trainer import Trainer
+    from model.model import GPT
 
     confs = yaml.safe_load(open(confpath))
 
