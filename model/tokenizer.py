@@ -160,27 +160,33 @@ class BytePairTokenizer:
 
     def save(self, path: str) -> None:
 
-        with open(f'{path}/freqs.json', 'w', encoding='utf-8') as outfile:
-            json.dump(self.freqs, outfile, indent=4, ensure_ascii=False)
+        try:
+            with open(f'{path}/freqs.json', 'w', encoding='utf-8') as outfile:
+                json.dump(self.freqs, outfile, indent=4, ensure_ascii=False)
 
-        with open(f'{path}/vocab_to_idx.json', 'w', encoding='utf-8') as outfile:
-            json.dump(self.vocab_to_idx, outfile, indent=4, ensure_ascii=False)
+            with open(f'{path}/vocab_to_idx.json', 'w', encoding='utf-8') as outfile:
+                json.dump(self.vocab_to_idx, outfile, indent=4, ensure_ascii=False)
 
-        with open(f'{path}/idx_to_vocab.json', 'w', encoding='utf-8') as outfile:
-            json.dump(self.idx_to_vocab, outfile, indent=4, ensure_ascii=False)
+            with open(f'{path}/idx_to_vocab.json', 'w', encoding='utf-8') as outfile:
+                json.dump(self.idx_to_vocab, outfile, indent=4, ensure_ascii=False)
+        except OSError as exc:
+            raise RuntimeError(f'Failed to save tokenizer to {path}') from exc
 
 
     @staticmethod
     def load(path: str) -> 'BytePairTokenizer':
 
-        with open(f'{path}/freqs.json', 'r', encoding='utf-8') as infile:
-            freqs = json.load(infile)
+        try:
+            with open(f'{path}/freqs.json', 'r', encoding='utf-8') as infile:
+                freqs = json.load(infile)
 
-        with open(f'{path}/vocab_to_idx.json', 'r', encoding='utf-8') as infile:
-            vocab_to_idx = json.load(infile)
+            with open(f'{path}/vocab_to_idx.json', 'r', encoding='utf-8') as infile:
+                vocab_to_idx = json.load(infile)
 
-        with open(f'{path}/idx_to_vocab.json', 'r', encoding='utf-8') as infile:
-            idx_to_vocab = json.load(infile)
+            with open(f'{path}/idx_to_vocab.json', 'r', encoding='utf-8') as infile:
+                idx_to_vocab = json.load(infile)
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError(f'Failed to load tokenizer from {path}') from exc
 
         return BytePairTokenizer(freqs, vocab_to_idx, idx_to_vocab)
 

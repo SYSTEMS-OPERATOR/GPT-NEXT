@@ -23,10 +23,14 @@ class TokenIDDataset(IterableDataset):
             unk: token id for unknown token
         """
         super().__init__()
+        self.datapath = datapath
         if not os.path.isfile(datapath):
             raise FileNotFoundError(f"Dataset not found: {datapath}")
-        with open(datapath, "r", encoding="utf-8") as infile:
-            self.data = infile.readlines()
+        try:
+            with open(datapath, "r", encoding="utf-8") as infile:
+                self.data = infile.readlines()
+        except OSError as exc:
+            raise RuntimeError(f"Failed to read dataset {datapath}") from exc
         self.window_size = window_size
         self.vocab_size = vocab_size
         self.unk_token = unk
@@ -41,7 +45,12 @@ class TokenIDDataset(IterableDataset):
             start = randint(0, len(line) - self.window_size - 1)
             end = start + self.window_size + 1
 
-            ids = LongTensor([int(x) for x in line[start:end]])
+            try:
+                ids = LongTensor([int(x) for x in line[start:end]])
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid token in {self.datapath} line {line_idx}: {exc}"
+                ) from exc
             ignore = (ids == self.unk_token).float()
 
             yield ids[:-1], ids[1:], ignore[:-1]
