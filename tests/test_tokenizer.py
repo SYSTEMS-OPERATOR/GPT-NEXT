@@ -34,3 +34,22 @@ def test_merge_vocab():
     assert 'ab' in merged
     assert merged['ab'] == 2
     assert 'a b' not in merged
+
+
+def test_save_load_roundtrip(tmp_path):
+    freqs = {
+        'a': 1,
+        '<unk>': 1,
+        '<pad>': 1,
+        '<line/>': 1,
+        '</line>': 1,
+        '</w>': 1,
+    }
+    v2i, i2v = create_vocab_maps(freqs)
+    tokenizer = BytePairTokenizer(freqs, v2i, i2v)
+    tokenizer.save(tmp_path)
+    loaded = BytePairTokenizer.load(tmp_path)
+    assert loaded.vocab_to_idx == tokenizer.vocab_to_idx
+    assert loaded.idx_to_vocab == tokenizer.idx_to_vocab
+    # ensure integer keys were preserved
+    assert isinstance(next(iter(loaded.idx_to_vocab.keys())), int)

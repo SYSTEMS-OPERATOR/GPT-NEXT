@@ -213,6 +213,8 @@ class BytePairTokenizer:
             encoding='utf-8',
         ) as infile:
             idx_to_vocab = json.load(infile)
+            # json converts dictionary keys to strings; convert back to ints
+            idx_to_vocab = {int(k): v for k, v in idx_to_vocab.items()}
 
         return BytePairTokenizer(freqs, vocab_to_idx, idx_to_vocab)
 
