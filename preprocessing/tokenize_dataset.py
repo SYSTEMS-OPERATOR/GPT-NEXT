@@ -4,11 +4,14 @@ from argparse import ArgumentParser
 from multiprocessing import Pool
 from itertools import repeat
 from typing import List
+import os
+import sys
 
 from nltk import wordpunct_tokenize, sent_tokenize
 from tqdm import tqdm
 
 from model.tokenizer import BytePairTokenizer, count_byte_freqs
+from sentinel import panic
 
 
 def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
@@ -22,7 +25,10 @@ def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
     """
 
     outpath = f"{outdir}/{filepath.split('/')[-1]}"
-    lines = sent_tokenize(open(filepath, encoding='utf-8-sig').read())
+    try:
+        lines = sent_tokenize(open(filepath, encoding='utf-8-sig').read())
+    except FileNotFoundError:
+        panic(f"Input file not found: {filepath}")
 
     tokens = []
     for line in lines:
@@ -30,6 +36,7 @@ def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
             tokens += get_line_ids(line, tokenizer)
 
     start, end = 0, line_length 
+    os.makedirs(outdir, exist_ok=True)
     with open(outpath, 'w') as outfile:
         while start < len(tokens):
             if len(tokens[start:end]) == line_length:
@@ -81,8 +88,14 @@ def main():
     inpath = args.inpath
     jobs = args.jobs
 
-    filepaths = [line.strip() for line in open(inpath).readlines()]
-    tokenizer = BytePairTokenizer.load(checkpoint)
+    try:
+        filepaths = [line.strip() for line in open(inpath).readlines()]
+    except FileNotFoundError:
+        panic(f"File list not found: {inpath}")
+    try:
+        tokenizer = BytePairTokenizer.load(checkpoint)
+    except Exception as exc:
+        panic(f"Failed to load tokenizer: {exc}")
 
     progress = tqdm(total=len(filepaths))
     start, end = 0, jobs
@@ -90,16 +103,19 @@ def main():
 
         paths = filepaths[start:end]
 
-        with Pool(jobs) as pool:
-            pool.starmap(
-                tokenize_file, 
-                zip(
-                    paths, 
-                    repeat(outdir), 
-                    repeat(tokenizer),
-                    repeat(line_length)
+        try:
+            with Pool(jobs) as pool:
+                pool.starmap(
+                    tokenize_file,
+                    zip(
+                        paths,
+                        repeat(outdir),
+                        repeat(tokenizer),
+                        repeat(line_length)
+                    )
                 )
-            )
+        except Exception as exc:
+            panic(f"Worker failure: {exc}")
 
         progress.update(len(paths))
         start += jobs

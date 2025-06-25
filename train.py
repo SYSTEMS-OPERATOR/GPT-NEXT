@@ -3,6 +3,7 @@
 import argparse
 import shutil
 import os
+import sys
 
 from miniyaml import load as load_yaml
 
@@ -19,6 +20,7 @@ except ModuleNotFoundError as exc:
 from model.dataset import TokenIDDataset, TokenIDSubset
 from model.trainer import Trainer
 from model.model import GPT
+from sentinel import panic
 
 
 def save_checkpoint(path, model, opt, sch, epoch):
@@ -55,12 +57,23 @@ def main():
     confpath = args.confpath
     checkpoint = args.checkpoint
 
-    confs = load_yaml(confpath)
+    try:
+        confs = load_yaml(confpath)
+    except FileNotFoundError:
+        panic(f"Config not found: {confpath}")
+    except Exception as exc:  # pragma: no cover - parse errors
+        panic(f"Failed to load config: {exc}")
 
-    train_data = TokenIDDataset(**confs['train_data'])
-    dev_data = TokenIDDataset(**confs['dev_data'])
+    try:
+        train_data = TokenIDDataset(**confs['train_data'])
+        dev_data = TokenIDDataset(**confs['dev_data'])
+    except Exception as exc:
+        panic(f"Dataset loading failed: {exc}")
 
-    model = GPT(**confs['model'])
+    try:
+        model = GPT(**confs['model'])
+    except Exception as exc:
+        panic(f"Model init failed: {exc}")
     opt = AdamW(model.get_parameters(), **confs['opt'])
     sch = OneCycleLR(opt, **confs['sch'])
     crit = CrossEntropyLoss(ignore_index=confs['unk'])
@@ -69,10 +82,13 @@ def main():
 
     start_epoch = 0
     if checkpoint is not None:
-        model.load_state_dict(load(f'{checkpoint}/model.pth'))
-        opt.load_state_dict(load(f'{checkpoint}/opt.pth'))
-        sch.load_state_dict(load(f'{checkpoint}/sch.pth'))
-        start_epoch = int(checkpoint.split('epoch_')[-1].strip('/'))
+        try:
+            model.load_state_dict(load(f'{checkpoint}/model.pth'))
+            opt.load_state_dict(load(f'{checkpoint}/opt.pth'))
+            sch.load_state_dict(load(f'{checkpoint}/sch.pth'))
+            start_epoch = int(checkpoint.split('epoch_')[-1].strip('/'))
+        except Exception as exc:
+            panic(f"Checkpoint load failed: {exc}")
 
     for epoch in range(start_epoch, confs['epochs']):
 
@@ -84,10 +100,13 @@ def main():
         tloader = DataLoader(collate_fn=collate, **confs['loader'], dataset=train)
         dloader = DataLoader(collate_fn=collate, **confs['loader'], dataset=dev)
 
-        train_metrics = trainer.run_epoch(tloader)
-        dev_metrics = trainer.run_epoch(dloader, train_mode=False)
-        publish_metrics(logger, train_metrics, dev_metrics, epoch+1)
-        save_checkpoint(confs['checkpoint'], model, opt, sch, epoch+1)
+        try:
+            train_metrics = trainer.run_epoch(tloader)
+            dev_metrics = trainer.run_epoch(dloader, train_mode=False)
+            publish_metrics(logger, train_metrics, dev_metrics, epoch+1)
+            save_checkpoint(confs['checkpoint'], model, opt, sch, epoch+1)
+        except Exception as exc:
+            panic(f"Training failed at epoch {epoch+1}: {exc}")
 
 
 if __name__ == '__main__':
