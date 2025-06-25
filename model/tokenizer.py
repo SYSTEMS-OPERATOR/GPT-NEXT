@@ -178,6 +178,11 @@ class BytePairTokenizer:
     @staticmethod
     def load(path: str) -> 'BytePairTokenizer':
 
+        required = ['freqs.json', 'vocab_to_idx.json', 'idx_to_vocab.json']
+        for fname in required:
+            if not os.path.isfile(f'{path}/{fname}'):
+                raise FileNotFoundError(f'Missing {fname} in {path}')
+
         path = sanitize_path(path)
         try:
             with open(os.path.join(path, 'freqs.json'), 'r', encoding='utf-8') as infile:
@@ -196,7 +201,7 @@ class BytePairTokenizer:
 
     @staticmethod
     def train_bpe(filepaths: List[str], mincount: int, merges: int) \
-                  -> 'BytePairtokenizer':
+                  -> 'BytePairTokenizer':
         """ Create trained byte pair tokenizer
 
         Args:
