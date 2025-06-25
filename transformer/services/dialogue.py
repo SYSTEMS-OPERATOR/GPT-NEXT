@@ -2,6 +2,7 @@
 
 import re
 import random
+import string
 
 # Maximum allowed input length for messages 🚦
 MAX_MESSAGE_LENGTH = 200
@@ -100,6 +101,17 @@ doctor_patterns = [
 
 # Use the same patterns for ELIZA persona (alias to doctor_patterns)
 eliza_patterns = doctor_patterns
+
+
+def sanitize_input(text: str, limit: int = 500) -> str:
+    """Remove non-printable characters and trim to a sane length."""
+    if not isinstance(text, str):
+        raise TypeError("message must be a string")
+    cleaned = "".join(ch for ch in text if ch in string.printable)
+    cleaned = cleaned.strip()
+    if len(cleaned) > limit:
+        cleaned = cleaned[:limit]
+    return cleaned
 
 def reflect(fragment):
     """Reflects a fragment of input by swapping pronouns (I -> you, me -> you, etc.)."""

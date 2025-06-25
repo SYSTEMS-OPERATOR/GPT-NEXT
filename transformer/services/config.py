@@ -27,6 +27,8 @@ def load_config(config_path=None, env_prefix=None, defaults=None):
                     config[key.upper()] = val
         except FileNotFoundError:
             pass
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Invalid JSON in config file {config_path}") from exc
     # Override with environment variables
     for key, val in os.environ.items():
         # Apply prefix filter if given
