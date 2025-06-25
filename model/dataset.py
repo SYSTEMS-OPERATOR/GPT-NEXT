@@ -13,8 +13,9 @@ class TokenIDDataset(IterableDataset):
 
     def __init__(self, datapath: str, window_size: int, vocab_size: int, 
                  unk: int):
-        """ Dataset class for dataset of variable length lines of text token
-            byte pair ids
+        """ Dataset class for variable-length token ID sequences. 🛡️
+
+            Performs initial validation to ensure data integrity.
 
         Args:
             datapath: file where data is located
@@ -23,10 +24,13 @@ class TokenIDDataset(IterableDataset):
             unk: token id for unknown token
         """
         super().__init__()
-        if not os.path.isfile(datapath):
-            raise FileNotFoundError(f"Dataset not found: {datapath}")
-        with open(datapath, "r", encoding="utf-8") as infile:
+        self.datapath = datapath
+        if not os.path.isfile(self.datapath):
+            raise FileNotFoundError(f"Dataset not found: {self.datapath}")
+        with open(self.datapath, "r", encoding="utf-8") as infile:
             self.data = infile.readlines()
+        if not self.data:
+            raise ValueError(f"Dataset file {self.datapath} is empty")
         self.window_size = window_size
         self.vocab_size = vocab_size
         self.unk_token = unk
@@ -41,7 +45,11 @@ class TokenIDDataset(IterableDataset):
             start = randint(0, len(line) - self.window_size - 1)
             end = start + self.window_size + 1
 
-            ids = LongTensor([int(x) for x in line[start:end]])
+            try:
+                ids = LongTensor([int(x) for x in line[start:end]])
+            except ValueError:
+                print(f"\u26a0\ufe0f  skipping corrupt line {line_idx} in {self.datapath}")
+                continue
             ignore = (ids == self.unk_token).float()
 
             yield ids[:-1], ids[1:], ignore[:-1]

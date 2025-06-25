@@ -1,14 +1,20 @@
 """Simplistic YAML loader to avoid external dependencies."""
 
 from typing import Any, Dict
+import os
 
 
 def load(path: str) -> Dict[str, Any]:
     """Load a subset of YAML syntax from ``path``.
 
     This parser supports mappings, simple lists, anchors and references.
-    It falls back to the full PyYAML parser if available.
+    It falls back to the full PyYAML parser if available. The function
+    performs validation so misconfigurations don't slip through the cracks.🔒
     """
+
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"Config file not found: {path}")
+
     try:
         import yaml  # type: ignore
 
@@ -19,9 +25,13 @@ def load(path: str) -> Dict[str, Any]:
 
 
 def _load_without_yaml(path: str) -> Dict[str, Any]:
+    """Fallback YAML loader used when PyYAML isn't installed. 🛡️"""
     anchors: Dict[str, Any] = {}
     root: Dict[str, Any] = {}
     stack = [(0, root)]  # list of (indent, container)
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"Config file not found: {path}")
+
     with open(path, "r", encoding="utf-8") as fh:
         for line in fh:
             line = line.rstrip()

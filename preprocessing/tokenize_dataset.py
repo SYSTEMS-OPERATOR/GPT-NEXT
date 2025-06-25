@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from multiprocessing import Pool
 from itertools import repeat
 from typing import List
+import os
 
 from nltk import wordpunct_tokenize, sent_tokenize
 from tqdm import tqdm
@@ -13,7 +14,7 @@ from model.tokenizer import BytePairTokenizer, count_byte_freqs
 
 def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
                   line_length: int) -> None:
-    """ Tokenize given file and write token ids to new file
+    """Tokenize given file and write token ids to new file. 🛡️
 
     Args:
         filepath: filepath of file to tokenize
@@ -22,6 +23,8 @@ def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
     """
 
     outpath = f"{outdir}/{filepath.split('/')[-1]}"
+    if not os.path.isfile(filepath):
+        raise FileNotFoundError(f"File to tokenize not found: {filepath}")
     lines = sent_tokenize(open(filepath, encoding='utf-8-sig').read())
 
     tokens = []
@@ -66,7 +69,7 @@ def get_line_ids(line: str, tokenizer: BytePairTokenizer) -> List[int]:
 
 
 def main():
-    """Tokenize an input dataset using a trained tokenizer."""
+    """Tokenize an input dataset using a trained tokenizer. ✨"""
 
     parser = ArgumentParser()
     parser.add_argument('-c', '--checkpoint', required=True)
@@ -81,6 +84,12 @@ def main():
     inpath = args.inpath
     jobs = args.jobs
 
+    if not os.path.isfile(inpath):
+        raise FileNotFoundError(f"Input path file not found: {inpath}")
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+    if not os.path.isdir(checkpoint):
+        raise FileNotFoundError(f"Checkpoint directory not found: {checkpoint}")
     filepaths = [line.strip() for line in open(inpath).readlines()]
     tokenizer = BytePairTokenizer.load(checkpoint)
 
