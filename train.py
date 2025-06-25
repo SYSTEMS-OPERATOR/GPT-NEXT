@@ -2,15 +2,19 @@
 
 import argparse
 import shutil
-import yaml
 import os
 
-from torch.optim.lr_scheduler import OneCycleLR
-from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
-from torch.nn import CrossEntropyLoss
-from torch import load, ones, save
-from torch.optim import AdamW
+from miniyaml import load as load_yaml
+
+try:
+    from torch.optim.lr_scheduler import OneCycleLR
+    from torch.utils.data import DataLoader
+    from tensorboardX import SummaryWriter
+    from torch.nn import CrossEntropyLoss
+    from torch import load, ones, save
+    from torch.optim import AdamW
+except ModuleNotFoundError as exc:
+    raise SystemExit("PyTorch and tensorboardX are required for training") from exc
 
 from model.dataset import TokenIDDataset, TokenIDSubset
 from model.trainer import Trainer
@@ -51,7 +55,7 @@ def main():
     confpath = args.confpath
     checkpoint = args.checkpoint
 
-    confs = yaml.safe_load(open(confpath))
+    confs = load_yaml(confpath)
 
     train_data = TokenIDDataset(**confs['train_data'])
     dev_data = TokenIDDataset(**confs['dev_data'])

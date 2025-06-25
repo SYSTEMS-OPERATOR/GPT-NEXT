@@ -1,13 +1,16 @@
 """ELIZA service providing a simple therapeutic chatbot interface."""
 
-from flask import Flask, request, jsonify, g
+try:
+    from flask import Flask, request, jsonify, g
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+except ModuleNotFoundError as exc:
+    raise SystemExit("Flask is required to run this service") from exc
 import jwt
 import sys
 import ssl
 import uuid
 from werkzeug.exceptions import HTTPException
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 # Import shared utilities from services
 try:
