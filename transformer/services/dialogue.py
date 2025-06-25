@@ -3,6 +3,9 @@
 import re
 import random
 
+# Maximum allowed input length for messages 🚦
+MAX_MESSAGE_LENGTH = 200
+
 # Reflection map for pronoun swapping
 reflections = {
     "am": "are", "was": "were", "i": "you", "i'd": "you would", "i've": "you have",
@@ -106,8 +109,19 @@ def reflect(fragment):
             tokens[i] = reflections[token]
     return " ".join(tokens)
 
+
+def sanitize_message(message: str, max_length: int = MAX_MESSAGE_LENGTH) -> str:
+    """Clean incoming messages and enforce length limits. 🧹"""
+    if not isinstance(message, str):
+        raise ValueError("Message must be a string")
+    clean = re.sub(r"[^\x20-\x7E]+", "", message.strip())
+    if len(clean) > max_length:
+        raise ValueError("Message exceeds maximum length")
+    return clean
+
 def generate_response(message, persona="doctor"):
-    """Generate a response to the user's message using the specified persona's rules."""
+    """Generate a sanitized reply using the specified persona's rules."""
+    message = sanitize_message(message)
     patterns = doctor_patterns if persona == "doctor" else eliza_patterns
     for pattern, responses in patterns:
         match = re.match(pattern, message.strip(), re.IGNORECASE)

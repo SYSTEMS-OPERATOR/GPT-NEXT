@@ -107,7 +107,10 @@ def message():
     user_msg = data.get("message")
     if not user_msg:
         return jsonify({"error": "No message provided"}), 400
-    bot_reply = generate_response(user_msg, persona="doctor")
+    try:
+        bot_reply = generate_response(user_msg, persona="doctor")
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
     return jsonify({"response": bot_reply})
 
 limiter.exempt(health)

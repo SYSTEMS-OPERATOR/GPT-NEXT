@@ -26,9 +26,12 @@ def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
 
     outpath = f"{outdir}/{filepath.split('/')[-1]}"
     try:
-        lines = sent_tokenize(open(filepath, encoding='utf-8-sig').read())
+        with open(filepath, encoding='utf-8-sig') as infile:
+            lines = sent_tokenize(infile.read())
     except FileNotFoundError:
         panic(f"Input file not found: {filepath}")
+    except OSError as exc:
+        panic(f"Failed to read input file: {exc}")
 
     tokens = []
     for line in lines:
@@ -89,9 +92,12 @@ def main():
     jobs = args.jobs
 
     try:
-        filepaths = [line.strip() for line in open(inpath).readlines()]
+        with open(inpath, encoding='utf-8') as infile:
+            filepaths = [line.strip() for line in infile.readlines()]
     except FileNotFoundError:
         panic(f"File list not found: {inpath}")
+    except OSError as exc:
+        panic(f"Failed to read file list: {exc}")
     try:
         tokenizer = BytePairTokenizer.load(checkpoint)
     except Exception as exc:
