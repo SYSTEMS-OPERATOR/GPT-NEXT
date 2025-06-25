@@ -1,8 +1,11 @@
 """Utility script for training a byte-pair tokenizer."""
 
 from argparse import ArgumentParser
+import sys
+import os
 
 from model.tokenizer import BytePairTokenizer
+from sentinel import panic
 
 
 def main():
@@ -19,9 +22,19 @@ def main():
     merges = args.merges
     mincount = args.mincount
 
-    filepaths = [path.strip() for path in open(inpath).readlines()]
-    tokenizer = BytePairTokenizer.train_bpe(filepaths, mincount, merges)
-    tokenizer.save(f'{outpath}')
+    try:
+        filepaths = [path.strip() for path in open(inpath).readlines()]
+    except FileNotFoundError:
+        panic(f"File list not found: {inpath}")
+    try:
+        tokenizer = BytePairTokenizer.train_bpe(filepaths, mincount, merges)
+    except Exception as exc:
+        panic(f"Tokenizer training failed: {exc}")
+    os.makedirs(outpath, exist_ok=True)
+    try:
+        tokenizer.save(f'{outpath}')
+    except Exception as exc:
+        panic(f"Failed to save tokenizer: {exc}")
 
 
 if __name__ == '__main__':
