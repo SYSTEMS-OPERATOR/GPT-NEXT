@@ -11,7 +11,7 @@ from nltk import wordpunct_tokenize, sent_tokenize
 from tqdm import tqdm
 
 from model.tokenizer import BytePairTokenizer, count_byte_freqs
-from sentinel import panic
+from sentinel import panic, sanitize_path
 
 
 def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
@@ -24,7 +24,7 @@ def tokenize_file(filepath: str, outdir: str, tokenizer: BytePairTokenizer,
         tokenizer: tokenizer instance to use to tokenize file
     """
 
-    outpath = f"{outdir}/{filepath.split('/')[-1]}"
+    outpath = f"{outdir}/{os.path.basename(filepath)}"
     try:
         with open(filepath, encoding='utf-8-sig') as infile:
             lines = sent_tokenize(infile.read())
@@ -86,13 +86,13 @@ def main():
     parser.add_argument('-j', '--jobs', required=True, type=int)
     args = parser.parse_args()
     line_length = args.line_length
-    checkpoint = args.checkpoint
-    outdir = args.outdir
-    inpath = args.inpath
+    checkpoint = sanitize_path(args.checkpoint)
+    outdir = sanitize_path(args.outdir)
+    inpath = sanitize_path(args.inpath)
     jobs = args.jobs
 
     try:
-        with open(inpath, encoding='utf-8') as infile:
+        with open(inpath, 'r', encoding='utf-8') as infile:
             filepaths = [line.strip() for line in infile.readlines()]
     except FileNotFoundError:
         panic(f"File list not found: {inpath}")

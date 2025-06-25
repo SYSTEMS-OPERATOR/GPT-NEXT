@@ -5,7 +5,7 @@ import sys
 import os
 
 from model.tokenizer import BytePairTokenizer
-from sentinel import panic
+from sentinel import panic, sanitize_path
 
 
 def main():
@@ -17,13 +17,13 @@ def main():
     parser.add_argument('-m', '--merges', required=True, type=int)
     parser.add_argument('-n', '--mincount', required=True, type=int)
     args = parser.parse_args()
-    outpath = args.outpath
-    inpath = args.inpath
+    outpath = sanitize_path(args.outpath)
+    inpath = sanitize_path(args.inpath)
     merges = args.merges
     mincount = args.mincount
 
     try:
-        with open(inpath, encoding='utf-8') as infile:
+        with open(inpath, 'r', encoding='utf-8') as infile:
             filepaths = [path.strip() for path in infile.readlines()]
     except FileNotFoundError:
         panic(f"File list not found: {inpath}")
