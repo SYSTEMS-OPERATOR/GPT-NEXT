@@ -1,6 +1,7 @@
 """Datasets for handling token ID sequences used during GPT training."""
 
 from random import randint, sample
+import os
 
 from torch import FloatTensor, LongTensor, Tensor, stack, cat
 from torch.utils.data import IterableDataset
@@ -22,7 +23,10 @@ class TokenIDDataset(IterableDataset):
             unk: token id for unknown token
         """
         super().__init__()
-        self.data = open(datapath).readlines()
+        if not os.path.isfile(datapath):
+            raise FileNotFoundError(f"Dataset not found: {datapath}")
+        with open(datapath, "r", encoding="utf-8") as infile:
+            self.data = infile.readlines()
         self.window_size = window_size
         self.vocab_size = vocab_size
         self.unk_token = unk
@@ -31,13 +35,14 @@ class TokenIDDataset(IterableDataset):
     def __iter__(self):
         """Yield one training sample at a time."""
         for line_idx in range(len(self.data)):
-
             line = self.data[line_idx].strip().split(' ')
-            start = randint(0, len(line)-self.window_size-1)
+            if len(line) <= self.window_size:
+                continue  # Skip lines that are too short
+            start = randint(0, len(line) - self.window_size - 1)
             end = start + self.window_size + 1
 
             ids = LongTensor([int(x) for x in line[start:end]])
-            ignore = (ids==self.unk_token).float()
+            ignore = (ids == self.unk_token).float()
 
             yield ids[:-1], ids[1:], ignore[:-1]
 
