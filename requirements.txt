@@ -1,1 +1,6 @@
 pytest
+pyyaml
+torch
+tqdm
+tensorboardX
+nltk
