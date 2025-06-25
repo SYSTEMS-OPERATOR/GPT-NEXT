@@ -43,7 +43,7 @@ Details about necessary prerequisites, including software and hardware requireme
 Step-by-step guide to installing and configuring GPT-1 on your system.
 
 ## Contributing 🤝
-We welcome contributions from the community. Please refer to the [CONTRIBUTING.md](LINK_TO_YOUR_CONTRIBUTING.MD) for guidelines on how to contribute.
+We welcome contributions from the community. Please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute.
 
 ## Versioning 🗂️
 For the versions available, see the [tags on this repository](https://github.com/yourproject/tags).
