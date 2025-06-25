@@ -23,9 +23,12 @@ def main():
     mincount = args.mincount
 
     try:
-        filepaths = [path.strip() for path in open(inpath).readlines()]
+        with open(inpath, encoding='utf-8') as infile:
+            filepaths = [path.strip() for path in infile.readlines()]
     except FileNotFoundError:
         panic(f"File list not found: {inpath}")
+    except OSError as exc:
+        panic(f"Failed to read file list: {exc}")
     try:
         tokenizer = BytePairTokenizer.train_bpe(filepaths, mincount, merges)
     except Exception as exc:
