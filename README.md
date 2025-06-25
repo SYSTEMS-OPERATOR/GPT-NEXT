@@ -21,7 +21,7 @@ The model's performance was particularly notable in tasks requiring contextual u
 ## Implementation 🛠️
 This repository provides implementation details and resources for GPT-1. Users can utilize this model for various NLP tasks, adapting it to specific requirements and datasets.
 
-Additional documentation is available in [MODEL.md](model/MODEL.md) and [DATASET.md](model/DATASET.md).
+Additional documentation is available in [MODEL.md](model/MODEL.md), [DATASET.md](model/DATASET.md), and [PROGRAM_FLOW.md](PROGRAM_FLOW.md).
 
 ### Getting Started ⚡
 See [SETUP.md](SETUP.md) for environment setup and training instructions. Once dependencies are installed you can pretrain the model with:
