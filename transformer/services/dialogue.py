@@ -2,6 +2,10 @@
 
 import re
 import random
+import string
+
+# Maximum allowed input length for messages 🚦
+MAX_MESSAGE_LENGTH = 200
 
 # Reflection map for pronoun swapping
 reflections = {
@@ -98,6 +102,17 @@ doctor_patterns = [
 # Use the same patterns for ELIZA persona (alias to doctor_patterns)
 eliza_patterns = doctor_patterns
 
+
+def sanitize_input(text: str, limit: int = 500) -> str:
+    """Remove non-printable characters and trim to a sane length."""
+    if not isinstance(text, str):
+        raise TypeError("message must be a string")
+    cleaned = "".join(ch for ch in text if ch in string.printable)
+    cleaned = cleaned.strip()
+    if len(cleaned) > limit:
+        cleaned = cleaned[:limit]
+    return cleaned
+
 def reflect(fragment):
     """Reflects a fragment of input by swapping pronouns (I -> you, me -> you, etc.)."""
     tokens = fragment.lower().split()
@@ -106,8 +121,19 @@ def reflect(fragment):
             tokens[i] = reflections[token]
     return " ".join(tokens)
 
+
+def sanitize_message(message: str, max_length: int = MAX_MESSAGE_LENGTH) -> str:
+    """Clean incoming messages and enforce length limits. 🧹"""
+    if not isinstance(message, str):
+        raise ValueError("Message must be a string")
+    clean = re.sub(r"[^\x20-\x7E]+", "", message.strip())
+    if len(clean) > max_length:
+        raise ValueError("Message exceeds maximum length")
+    return clean
+
 def generate_response(message, persona="doctor"):
-    """Generate a response to the user's message using the specified persona's rules."""
+    """Generate a sanitized reply using the specified persona's rules."""
+    message = sanitize_message(message)
     patterns = doctor_patterns if persona == "doctor" else eliza_patterns
     for pattern, responses in patterns:
         match = re.match(pattern, message.strip(), re.IGNORECASE)

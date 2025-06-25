@@ -14,7 +14,7 @@ except ModuleNotFoundError as exc:
 from model.tokenizer import BytePairTokenizer
 from model.sequencer import Sequencer
 from model.model import GPT
-from sentinel import panic
+from sentinel import panic, sanitize_path
 
 
 # Default configuration path. The repository stores configuration files under
@@ -31,14 +31,15 @@ def main():
     args = parser.parse_args()
     length = args.length
 
+    conf_file = sanitize_path(args.conf)
     try:
-        confs = load_yaml(args.conf)
+        confs = load_yaml(conf_file)
     except FileNotFoundError:
-        panic(f"Config not found: {args.conf}")
+        panic(f"Config not found: {conf_file}")
     except Exception as exc:  # pragma: no cover - unexpected parse errors
         panic(f"Failed to load config: {exc}")
 
-    model_path = confs.get('pretrained_model')
+    model_path = sanitize_path(confs.get('pretrained_model'))
     if not os.path.isfile(model_path):
         panic(f"Model file missing: {model_path}")
 
@@ -48,7 +49,7 @@ def main():
     except Exception as exc:
         panic(f"Could not load model: {exc}")
 
-    tok_path = confs.get('trained_tokenizer')
+    tok_path = sanitize_path(confs.get('trained_tokenizer'))
     if not os.path.isdir(tok_path):
         panic(f"Tokenizer data missing: {tok_path}")
 

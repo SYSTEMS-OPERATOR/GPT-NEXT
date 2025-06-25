@@ -20,11 +20,12 @@ except ModuleNotFoundError as exc:
 from model.dataset import TokenIDDataset, TokenIDSubset
 from model.trainer import Trainer
 from model.model import GPT
-from sentinel import panic
+from sentinel import panic, sanitize_path
 
 
 def save_checkpoint(path, model, opt, sch, epoch):
 
+    path = sanitize_path(path)
     filepath = f'{path}/epoch_{epoch}'
     if os.path.exists(filepath):
         shutil.rmtree(filepath)
@@ -54,8 +55,8 @@ def main():
     parser.add_argument('-c', '--confpath', type=str, required=True)
     parser.add_argument('-ch', '--checkpoint', type=str, default=None)
     args = parser.parse_args()
-    confpath = args.confpath
-    checkpoint = args.checkpoint
+    confpath = sanitize_path(args.confpath)
+    checkpoint = sanitize_path(args.checkpoint) if args.checkpoint else None
 
     try:
         confs = load_yaml(confpath)

@@ -3,6 +3,8 @@
 from typing import Tuple, Dict, List
 from collections import defaultdict
 import json, re
+import os
+from sentinel import sanitize_path
 
 from nltk import wordpunct_tokenize, sent_tokenize
 from tqdm import trange, tqdm
@@ -181,14 +183,15 @@ class BytePairTokenizer:
             if not os.path.isfile(f'{path}/{fname}'):
                 raise FileNotFoundError(f'Missing {fname} in {path}')
 
+        path = sanitize_path(path)
         try:
-            with open(f'{path}/freqs.json', 'r', encoding='utf-8') as infile:
+            with open(os.path.join(path, 'freqs.json'), 'r', encoding='utf-8') as infile:
                 freqs = json.load(infile)
 
-            with open(f'{path}/vocab_to_idx.json', 'r', encoding='utf-8') as infile:
+            with open(os.path.join(path, 'vocab_to_idx.json'), 'r', encoding='utf-8') as infile:
                 vocab_to_idx = json.load(infile)
 
-            with open(f'{path}/idx_to_vocab.json', 'r', encoding='utf-8') as infile:
+            with open(os.path.join(path, 'idx_to_vocab.json'), 'r', encoding='utf-8') as infile:
                 idx_to_vocab = json.load(infile)
         except (OSError, json.JSONDecodeError) as exc:
             raise RuntimeError(f'Failed to load tokenizer from {path}') from exc
@@ -241,11 +244,10 @@ def create_vocab(filepaths: List[str]) -> Dict[str, int]:
     vocab = defaultdict(int)
     for path in tqdm(filepaths, desc='Creating vocabulary'):
         try:
-            with open(path, 'r', encoding='utf-8-sig') as fh:
-                text = fh.read()
+            with open(path, 'r', encoding='utf-8-sig') as infile:
+                text = infile.read()
         except OSError as exc:
-            raise RuntimeError(f'Failed to read {path}') from exc
-
+            raise RuntimeError(f'Failed to read training file {path}') from exc
         sentences = sent_tokenize(text)
 
         for sentence in sentences:
