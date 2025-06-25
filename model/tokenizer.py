@@ -238,7 +238,11 @@ def create_vocab(filepaths: List[str]) -> Dict[str, int]:
 
     vocab = defaultdict(int)
     for path in tqdm(filepaths, desc='Creating vocabulary'):
-        text = open(path, 'r', encoding='utf-8-sig').read()
+        try:
+            with open(path, 'r', encoding='utf-8-sig') as infile:
+                text = infile.read()
+        except OSError as exc:
+            raise RuntimeError(f'Failed to read training file {path}') from exc
         sentences = sent_tokenize(text)
 
         for sentence in sentences:
