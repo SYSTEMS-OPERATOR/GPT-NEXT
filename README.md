@@ -46,6 +46,8 @@ loader.adversarial_defense()
 loader.save_model("optimized_model.safetensors")
 ```
 
+RingLoader checks the model file before every step 🛡️ so your workflow stays safe.
+
 ## Contributing 🙌
 We welcome contributions from the community. Please refer to the [CONTRIBUTING.md](LINK_TO_YOUR_CONTRIBUTING.MD) for guidelines on how to contribute.
 
