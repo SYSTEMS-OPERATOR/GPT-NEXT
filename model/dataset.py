@@ -3,6 +3,8 @@
 from random import randint, sample
 import os
 
+from sentinel import sanitize_path
+
 from torch import FloatTensor, LongTensor, Tensor, stack, cat
 from torch.utils.data import IterableDataset
 from torch.nn.functional import one_hot
@@ -23,14 +25,14 @@ class TokenIDDataset(IterableDataset):
             unk: token id for unknown token
         """
         super().__init__()
-        self.datapath = datapath
-        if not os.path.isfile(datapath):
-            raise FileNotFoundError(f"Dataset not found: {datapath}")
+        self.datapath = sanitize_path(datapath)
+        if not os.path.isfile(self.datapath):
+            raise FileNotFoundError(f"Dataset not found: {self.datapath}")
         try:
-            with open(datapath, "r", encoding="utf-8") as infile:
+            with open(self.datapath, "r", encoding="utf-8") as infile:
                 self.data = infile.readlines()
         except OSError as exc:
-            raise RuntimeError(f"Failed to read dataset {datapath}") from exc
+            raise RuntimeError(f"Failed to read dataset {self.datapath}") from exc
         self.window_size = window_size
         self.vocab_size = vocab_size
         self.unk_token = unk
