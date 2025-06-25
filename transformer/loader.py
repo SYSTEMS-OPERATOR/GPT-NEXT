@@ -1,5 +1,6 @@
 """Utilities for loading and transforming models for inference."""
 
+import os
 import torch
 import safetensors.torch
 from transformers import AutoTokenizer, AutoModel
@@ -25,6 +26,11 @@ class RingLoader:
         self.model = None
         self.tokenizer = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    def _ensure_loaded(self) -> None:
+        """Make sure a model is loaded before performing transformations."""
+        if self.model is None:
+            raise RuntimeError("Model not loaded. Call load_model() first.")
     
     def load_model(self):
         """Load model weights.
@@ -33,6 +39,8 @@ class RingLoader:
         load an ONNX model will raise ``NotImplementedError`` unless
         ``onnxruntime`` is available and integration is added.
         """
+        if not os.path.exists(self.model_path):
+            raise FileNotFoundError(f"Model file {self.model_path} not found")
         if self.model_type == "safetensors":
             self.model = safetensors.torch.load_file(self.model_path, device=self.device)
         elif self.model_type == "onnx":
@@ -48,6 +56,7 @@ class RingLoader:
 
         This removes discontinuities and enables seamless optimization.
         """
+        self._ensure_loaded()
         for key in self.model:
             tensor = self.model[key]
             if tensor.ndim == 2:  # Ensure transformation applies only to 2D tensors
@@ -58,6 +67,7 @@ class RingLoader:
     
     def recalibrate_model(self):
         """ Applies real-time recalibration for numerical consistency. """
+        self._ensure_loaded()
         for key in self.model:
             tensor = self.model[key]
             mean, std = tensor.mean(), tensor.std()
@@ -73,6 +83,7 @@ class RingLoader:
     
     def adversarial_defense(self):
         """ Checks for and neutralizes adversarial perturbations in model weights. """
+        self._ensure_loaded()
         for key in self.model:
             tensor = self.model[key]
             if torch.any(torch.isnan(tensor)) or torch.any(torch.isinf(tensor)):
@@ -81,6 +92,7 @@ class RingLoader:
     
     def save_model(self, output_path):
         """ Saves the transformed and optimized model. """
+        self._ensure_loaded()
         safetensors.torch.save_file(self.model, output_path)
         print(f"Optimized model saved at {output_path}")
 
