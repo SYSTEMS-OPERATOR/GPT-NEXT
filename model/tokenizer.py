@@ -176,6 +176,11 @@ class BytePairTokenizer:
     @staticmethod
     def load(path: str) -> 'BytePairTokenizer':
 
+        required = ['freqs.json', 'vocab_to_idx.json', 'idx_to_vocab.json']
+        for fname in required:
+            if not os.path.isfile(f'{path}/{fname}'):
+                raise FileNotFoundError(f'Missing {fname} in {path}')
+
         try:
             with open(f'{path}/freqs.json', 'r', encoding='utf-8') as infile:
                 freqs = json.load(infile)
@@ -193,7 +198,7 @@ class BytePairTokenizer:
 
     @staticmethod
     def train_bpe(filepaths: List[str], mincount: int, merges: int) \
-                  -> 'BytePairtokenizer':
+                  -> 'BytePairTokenizer':
         """ Create trained byte pair tokenizer
 
         Args:
@@ -235,7 +240,12 @@ def create_vocab(filepaths: List[str]) -> Dict[str, int]:
 
     vocab = defaultdict(int)
     for path in tqdm(filepaths, desc='Creating vocabulary'):
-        text = open(path, 'r', encoding='utf-8-sig').read()
+        try:
+            with open(path, 'r', encoding='utf-8-sig') as fh:
+                text = fh.read()
+        except OSError as exc:
+            raise RuntimeError(f'Failed to read {path}') from exc
+
         sentences = sent_tokenize(text)
 
         for sentence in sentences:

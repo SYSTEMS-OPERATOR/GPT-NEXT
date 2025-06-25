@@ -46,11 +46,19 @@ class TokenIDDataset(IterableDataset):
             end = start + self.window_size + 1
 
             try:
-                ids = LongTensor([int(x) for x in line[start:end]])
+                int_ids = [int(x) for x in line[start:end]]
             except ValueError as exc:
                 raise ValueError(
                     f"Invalid token in {self.datapath} line {line_idx}: {exc}"
                 ) from exc
+
+            for tid in int_ids:
+                if tid < 0 or tid >= self.vocab_size:
+                    raise ValueError(
+                        f"Token ID {tid} out of range in {self.datapath} line {line_idx}"
+                    )
+
+            ids = LongTensor(int_ids)
             ignore = (ids == self.unk_token).float()
 
             yield ids[:-1], ids[1:], ignore[:-1]
