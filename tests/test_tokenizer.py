@@ -36,6 +36,12 @@ def test_merge_vocab():
     assert 'a b' not in merged
 
 
+def test_merge_vocab_accumulates_counts():
+    vocab = {'a b c': 2, 'ab c': 1}
+    merged = merge_vocab(('a', 'b'), vocab)
+    assert merged['ab c'] == 3
+
+
 def test_save_load_roundtrip(tmp_path):
     freqs = {
         'a': 1,
