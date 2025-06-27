@@ -31,7 +31,7 @@ class TokenIDDataset(IterableDataset):
     def __iter__(self):
         for line_idx in range(len(self.data)):
 
-            line_tokens = self.data[line_idx].strip().split(' ')
+            line_tokens = self.data[line_idx].split()
 
             if len(line_tokens) <= self.window_size:
                 continue
