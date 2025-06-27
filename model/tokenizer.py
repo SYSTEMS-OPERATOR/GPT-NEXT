@@ -192,7 +192,7 @@ class BytePairTokenizer:
                 vocab_to_idx = json.load(infile)
 
             with open(os.path.join(path, 'idx_to_vocab.json'), 'r', encoding='utf-8') as infile:
-                idx_to_vocab = json.load(infile)
+                idx_to_vocab = {int(k): v for k, v in json.load(infile).items()}
         except (OSError, json.JSONDecodeError) as exc:
             raise RuntimeError(f'Failed to load tokenizer from {path}') from exc
 
