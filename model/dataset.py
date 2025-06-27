@@ -31,12 +31,16 @@ class TokenIDDataset(IterableDataset):
     def __iter__(self):
         for line_idx in range(len(self.data)):
 
-            line = self.data[line_idx].strip().split(' ')
-            start = randint(0, len(line)-self.window_size-1)
+            line_tokens = self.data[line_idx].strip().split(' ')
+
+            if len(line_tokens) <= self.window_size:
+                continue
+
+            start = randint(0, len(line_tokens) - self.window_size - 1)
             end = start + self.window_size + 1
 
-            ids = LongTensor([int(x) for x in line[start:end]])
-            ignore = (ids==self.unk_token).float()
+            ids = LongTensor([int(x) for x in line_tokens[start:end]])
+            ignore = (ids == self.unk_token).float()
 
             yield ids[:-1], ids[1:], ignore[:-1]
 
