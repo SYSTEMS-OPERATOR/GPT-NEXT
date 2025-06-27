@@ -225,6 +225,7 @@ class BytePairTokenizer:
         mincount: int,
         merges: int,
     ) -> 'BytePairTokenizer':
+      
         """ Create trained byte pair tokenizer
 
         Args:
