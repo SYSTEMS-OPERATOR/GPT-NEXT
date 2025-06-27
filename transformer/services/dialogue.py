@@ -20,23 +20,23 @@ doctor_patterns = [
         "Why do you need {0}?", 
         "Would it really help you to get {0}?", 
         "Are you sure you need {0}?"]),
-    (r'Why don\'?t you ([^\?]*)\??', [
-        "Do you really think I don't {0}?", 
-        "Perhaps eventually I will {0}.", 
+    (r"Why don't you ([^?]*)\??", [
+        "Do you really think I don't {0}?",
+        "Perhaps eventually I will {0}.",
         "Do you really want me to {0}?"]),
-    (r'Why can\'?t I ([^\?]*)\??', [
-        "Do you think you should be able to {0}?", 
-        "If you could {0}, what would you do?", 
+    (r"Why can't I ([^?]*)\??", [
+        "Do you think you should be able to {0}?",
+        "If you could {0}, what would you do?",
         "What’s stopping you from {0}?"]),
-    (r'I can\'?t (.*)', [
-        "How do you know you can't {0}?", 
-        "Perhaps you could {0} if you tried.", 
+    (r"I can't (.*)", [
+        "How do you know you can't {0}?",
+        "Perhaps you could {0} if you tried.",
         "What would it take for you to {0}?"]),
     (r'I am (.*)', [
         "Did you come to me because you are {0}?", 
         "How do you feel about being {0}?"]),
-    (r'I\'?m (.*)', [
-        "How do you feel about being {0}?", 
+    (r"I'm (.*)", [
+        "How do you feel about being {0}?",
         "Do you often feel {0}?"]),
     (r'You are (.*)', [
         "What makes you think I am {0}?", 
