@@ -54,7 +54,7 @@ class Sequencer:
             for i in trange(length):
                 probs, _ = self.model(token_ids, ignore_ids)
                 next_id = self.gen_next_token(probs, idx)
-                tokens.append(self.tokenizer.get_byte(str(next_id.item())))
+                tokens.append(self.tokenizer.get_byte(next_id.item()))
                 token_ids, ignore_ids, idx = self.update_token_ids(
                     idx, token_ids, next_id
                 )

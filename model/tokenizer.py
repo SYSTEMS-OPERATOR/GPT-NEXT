@@ -221,7 +221,7 @@ class BytePairTokenizer:
 
     @staticmethod
     def train_bpe(filepaths: List[str], mincount: int, merges: int) \
-                  -> 'BytePairtokenizer':
+                  -> 'BytePairTokenizer':
         """ Create trained byte pair tokenizer
 
         Args:
