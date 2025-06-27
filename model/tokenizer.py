@@ -355,7 +355,11 @@ def merge_vocab(pair: Tuple[str, str], v_in: Dict[str, int]) -> Dict[str, int]:
     p = re.compile(r'(?<!\S)' + bigram + r'(?!\S)')
     for word in v_in:
         w_out = p.sub(''.join(pair), word)
-        v_out[w_out] = v_in[word]
+        # Combine counts if multiple words collapse into the same token
+        if w_out in v_out:
+            v_out[w_out] += v_in[word]
+        else:
+            v_out[w_out] = v_in[word]
 
     return v_out
 
