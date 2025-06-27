@@ -50,7 +50,7 @@ class Sequencer:
                 # Only the logits are required for probability calculation.
                 logits, _ = self.model(token_ids, ignore_ids)
                 next_id = self.gen_next_token(logits, idx)
-                tokens.append(self.tokenizer.get_byte(str(next_id.item())))
+                tokens.append(self.tokenizer.get_byte(next_id.item()))
                 token_ids, ignore_ids, idx = self.update_token_ids(
                     idx, token_ids, next_id
                 )
