@@ -20,7 +20,9 @@ def safe_load(stream):
             line = f"{indent}{key}: {val}"
         elif alias_def:
             indent, key, anc = alias_def.groups()
-            val = anchors.get(anc)
+            if anc not in anchors:
+                raise ValueError(f'Alias "{anc}" not defined')
+            val = anchors[anc]
             val_repr = repr(val) if isinstance(val, str) else str(val)
             line = f"{indent}{key}: {val_repr}"
         processed.append(line)
