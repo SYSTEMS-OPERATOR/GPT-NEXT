@@ -1,6 +1,7 @@
 from typing import Tuple, Dict, List
 from collections import defaultdict
-import json, re
+import json
+import re
 
 try:
     from nltk import wordpunct_tokenize, sent_tokenize

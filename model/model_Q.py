@@ -1,11 +1,9 @@
+"""Alternative GPT implementation with experimental decoding methods."""
+
 import random
 
 import torch
 import torch.nn as nn
-from config import *
-
-"""Alternative GPT implementation with experimental decoding methods."""
-import copy
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -156,7 +154,7 @@ class Decoder(nn.Module):
     def __init__(self, arg, vob_len):
         super().__init__()
         self.arg = arg
-        self.embedding = EmbeddingLayer(self.arg,vob_len)
+        self.embedding = EmbeddingLayer(self.arg, vob_len)
         # self.layers = nn.Sequential(*[DecoderBlock() for i in range(3)])
         self.layers = nn.ModuleList([
             DecoderBlock(self.arg)
