@@ -1,8 +1,7 @@
 from random import randint, sample
 
-from torch import FloatTensor, LongTensor, Tensor, stack, cat
+from torch import LongTensor, Tensor, cat
 from torch.utils.data import IterableDataset
-from torch.nn.functional import one_hot
 
 """Dataset utilities for handling token ID sequences."""
 

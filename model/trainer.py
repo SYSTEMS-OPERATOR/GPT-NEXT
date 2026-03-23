@@ -1,54 +1,43 @@
-from typing import Dict
+"""Training utilities for running epochs and optimization."""
 
-from torch import set_grad_enabled, argmax, Tensor
+from typing import Any
+
+from torch import Tensor, argmax, set_grad_enabled
 from torch.nn.utils import clip_grad_norm_
 from torch.utils.data import DataLoader
-
-"""Training utilities for running epochs and optimization."""
 from tqdm import tqdm
 
 from model.utils import RollingCounter
 
 
 class Trainer:
+    """Encapsulate training/evaluation logic for one model."""
 
-
-    def __init__(self, model: 'Model', crit: 'Loss', opt: 'Optimizer', 
-                 sch: 'Scheduler', device: str):
-        """ Initialize trainer
-
-        Args:
-            model: model to train
-            crit: loss function to train with
-            opt: optimizer to train with
-            sch: learning rate scheduler
-            device: device to place trainer on
-        """
-
+    def __init__(
+        self,
+        model: Any,
+        crit: Any,
+        opt: Any,
+        sch: Any,
+        device: str,
+    ):
+        """Initialize trainer dependencies and runtime device."""
         self.device = device
         self.model = model
         self.crit = crit
         self.opt = opt
         self.sch = sch
-        
 
     def run_epoch(
         self,
         loader: DataLoader,
         train_mode: bool = True,
-    ) -> Dict[str, int]:
-        """ Run a single epoch of training
-
-        Args:
-            loader: data loader to train / evaluate data on
-            train_mode: flag indicating whether epoch is training or evaluation
-
-        Returns:
-            (Dict[str, int]): dictionary containing epoch metrics
-        """
-
+    ) -> dict[str, float]:
+        """Run a single training or evaluation epoch and return metrics."""
+        # Dev Agent Breadcrumb: each batch executes `step`, then metrics are
+        # aggregated in a rolling counter for both progress and final summary.
         loss_metric, err_metric = RollingCounter(1000), RollingCounter(1000)
-        progress = tqdm(total=len(loader), desc='LR: | Loss: | Err: ')
+        progress = tqdm(total=len(loader), desc="LR: | Loss: | Err: ")
 
         self.model.train(mode=train_mode)
         with set_grad_enabled(train_mode):
@@ -61,35 +50,27 @@ class Trainer:
                 err_metric.add(err)
 
                 progress.set_description(
-                    f'LR: {self.sch.get_last_lr()[-1]:.8f} | '
-                    f'Loss: {loss_metric.rolling_average():.8f} | '
-                    f'Err: {err_metric.rolling_average():.8f}'
+                    f"LR: {self.sch.get_last_lr()[-1]:.8f} | "
+                    f"Loss: {loss_metric.rolling_average():.8f} | "
+                    f"Err: {err_metric.rolling_average():.8f}"
                 )
                 progress.update(1)
 
         return {
-            'total_average_loss': loss_metric.total_average(),
-            'rolling_average_loss': loss_metric.rolling_average(),
-            'total_average_err': err_metric.total_average(),
-            'rolling_average_err': err_metric.rolling_average(),
+            "total_average_loss": loss_metric.total_average(),
+            "rolling_average_loss": loss_metric.rolling_average(),
+            "total_average_err": err_metric.total_average(),
+            "rolling_average_err": err_metric.rolling_average(),
         }
 
-
-    def step(self, x: Tensor, y: Tensor, ignore: Tensor, 
-             train_mode: bool=True) -> (float, float):
-        """ Run one training step
-
-        Args:
-            x: input
-            y: labels
-            ignore: input indices to ignore
-            train_mode: flag indicating whether to train model during step
-
-        Returns:
-            (float): loss
-            (float): error
-        """
-
+    def step(
+        self,
+        x: Tensor,
+        y: Tensor,
+        ignore: Tensor,
+        train_mode: bool = True,
+    ) -> tuple[float, float]:
+        """Run one forward/backward/optimization step and return loss+error."""
         if train_mode:
             self.model.zero_grad()
             self.opt.zero_grad()
@@ -106,7 +87,6 @@ class Trainer:
             self.sch.step()
 
         y_pred = argmax(y_pred, dim=1)
-        err = (y_pred!=y).sum() / y.shape[0]
+        err = (y_pred != y).sum() / y.shape[0]
 
         return loss.item(), err
-

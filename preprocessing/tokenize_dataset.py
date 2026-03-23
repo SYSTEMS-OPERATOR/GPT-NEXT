@@ -6,7 +6,7 @@ from typing import List
 from nltk import wordpunct_tokenize, sent_tokenize
 from tqdm import tqdm
 
-from model.tokenizer import BytePairTokenizer, count_byte_freqs
+from model.tokenizer import BytePairTokenizer
 
 """Utilities for tokenizing raw text files into ID sequences."""
 

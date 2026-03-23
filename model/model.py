@@ -3,7 +3,7 @@ from typing import Dict, List
 import torch
 from torch.nn import ModuleList, Embedding, LayerNorm, Dropout, Softmax, \
                      Linear, Module, GELU
-from torch import LongTensor, Tensor, einsum, ones, sqrt, tril, triu, cat
+from torch import Tensor, einsum, sqrt, cat
 from torch.nn.init import normal_, ones_, zeros_
 
 class GPT(Module):
